@@ -1,65 +1,75 @@
-import Image from "next/image";
+import { createClient } from '@/lib/supabase/server';
+import HomeClient from './HomeClient';
+import type { DailyReading, BibleVersion, ReadingTrack, LectionaryReading } from '@/types';
+import { getTodayDateString } from '@/utils/date';
 
-export default function Home() {
+export default async function HomePage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const today = getTodayDateString();
+  let bibleVersion: BibleVersion = 'gaeyeok';
+  let readingTrack: ReadingTrack = 'lectionary';
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('bible_version, reading_track')
+      .eq('id', user.id)
+      .single();
+    if (profile?.bible_version) bibleVersion = profile.bible_version;
+    if (profile?.reading_track) readingTrack = profile.reading_track;
+  }
+
+  let reading: DailyReading | null = null;
+  let lectionaryReading: LectionaryReading | null = null;
+  let streakData = null;
+  let reflectionDates: string[] = [];
+
+  if (readingTrack === 'lectionary') {
+    const { data } = await supabase
+      .from('lectionary_readings')
+      .select('*')
+      .lte('sunday_date', today)
+      .order('sunday_date', { ascending: false })
+      .limit(1)
+      .single<LectionaryReading>();
+    lectionaryReading = data;
+  } else {
+    const { data } = await supabase
+      .from('daily_readings')
+      .select('*')
+      .eq('date', today)
+      .single<DailyReading>();
+    reading = data;
+  }
+
+  if (user) {
+    const [streakRes, reflectionsRes] = await Promise.all([
+      supabase.from('streaks').select('*').eq('user_id', user.id).single(),
+      supabase
+        .from('reflections')
+        .select('created_at')
+        .eq('user_id', user.id)
+        .gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()),
+    ]);
+
+    streakData = streakRes.data;
+    if (reflectionsRes.data) {
+      const dates = reflectionsRes.data.map((r: { created_at: string }) => r.created_at.split('T')[0]);
+      reflectionDates = [...new Set(dates)];
+    }
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <HomeClient
+      user={user}
+      reading={reading}
+      lectionaryReading={lectionaryReading}
+      readingTrack={readingTrack}
+      streak={streakData}
+      reflectionDates={reflectionDates}
+      bibleVersion={bibleVersion}
+    />
   );
 }
