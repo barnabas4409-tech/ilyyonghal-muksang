@@ -12,13 +12,11 @@ export default function LoginPage() {
     e.preventDefault();
     if (!email.trim()) return;
     setLoading(true);
-
     const supabase = createClient();
     await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: `${location.origin}/auth/callback` },
     });
-
     setLoading(false);
     setSent(true);
   }
@@ -34,10 +32,10 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col min-h-dvh items-center justify-center px-8">
       <div className="text-center mb-12">
-        <h1 className="font-serif-kr text-3xl font-light text-[#2C2416] dark:text-[#E8DCC8] mb-3">
+        <h1 className="font-serif-kr text-3xl font-light text-foreground mb-3">
           일용할묵상
         </h1>
-        <p className="text-sm text-[#C4A882] leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           매일 말씀을 읽고<br />
           묵상을 기록하며<br />
           영적 루틴을 만들어가세요
@@ -45,18 +43,13 @@ export default function LoginPage() {
       </div>
 
       {sent ? (
-        <div className="w-full text-center bg-[#EDE7DC] dark:bg-[#1E1B14] rounded-2xl p-6">
+        <div className="w-full text-center card-float p-6">
           <p className="text-2xl mb-3">✉️</p>
-          <p className="text-sm font-medium text-[#2C2416] dark:text-[#E8DCC8] mb-1">
-            이메일을 확인해주세요
-          </p>
-          <p className="text-xs text-[#C4A882]">
-            {email}로 로그인 링크를 보냈어요
-          </p>
+          <p className="text-sm font-medium text-foreground mb-1">이메일을 확인해주세요</p>
+          <p className="text-xs text-muted-foreground">{email}로 로그인 링크를 보냈어요</p>
         </div>
       ) : (
         <div className="w-full space-y-3">
-          {/* 이메일 Magic Link */}
           <form onSubmit={handleMagicLink} className="space-y-3">
             <input
               type="email"
@@ -64,28 +57,26 @@ export default function LoginPage() {
               onChange={e => setEmail(e.target.value)}
               placeholder="이메일 주소"
               required
-              className="w-full px-4 py-4 bg-[#EDE7DC] dark:bg-[#1E1B14] rounded-2xl text-sm text-[#2C2416] dark:text-[#E8DCC8] placeholder-[#C4A882] focus:outline-none focus:ring-1 focus:ring-[#8B7355]"
+              className="w-full px-4 py-4 bg-card text-foreground placeholder:text-muted-foreground rounded-2xl text-sm focus:outline-none focus:ring-1 focus:ring-ring liquid-transition"
             />
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-[#8B7355] text-[#F7F4EF] rounded-2xl text-sm font-medium disabled:opacity-50 active:scale-[0.98] transition-all"
+              className="w-full py-4 bg-primary text-primary-foreground rounded-2xl text-sm font-medium disabled:opacity-50 active:scale-[0.98] liquid-transition"
             >
               {loading ? '전송 중...' : '이메일로 시작하기'}
             </button>
           </form>
 
-          {/* 구분선 */}
           <div className="flex items-center gap-3 py-1">
-            <div className="flex-1 h-px bg-[#EDE7DC] dark:bg-[#1E1B14]" />
-            <span className="text-xs text-[#C4A882]">또는</span>
-            <div className="flex-1 h-px bg-[#EDE7DC] dark:bg-[#1E1B14]" />
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-xs text-muted-foreground">또는</span>
+            <div className="flex-1 h-px bg-border" />
           </div>
 
-          {/* Google 로그인 */}
           <button
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 py-4 bg-white dark:bg-[#1E1B14] border border-[#EDE7DC] dark:border-[#2C2416] rounded-2xl text-sm font-medium text-[#2C2416] dark:text-[#E8DCC8] hover:border-[#C4A882] active:scale-[0.98] transition-all"
+            className="w-full flex items-center justify-center gap-3 py-4 bg-background border border-border rounded-2xl text-sm font-medium text-foreground hover:bg-muted active:scale-[0.98] liquid-transition"
           >
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -98,7 +89,7 @@ export default function LoginPage() {
         </div>
       )}
 
-      <p className="text-xs text-[#C4A882] mt-8 text-center leading-relaxed">
+      <p className="text-xs text-muted-foreground mt-8 text-center leading-relaxed">
         시작하면 서비스 이용약관 및<br />개인정보 처리방침에 동의하는 것으로 간주됩니다.
       </p>
     </div>

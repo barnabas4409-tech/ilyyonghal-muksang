@@ -17,12 +17,12 @@ export default function StreakDots({ reflectionDates }: Props) {
         return (
           <div
             key={day}
-            className={`w-3 h-3 rounded-full transition-all ${
+            className={`w-2.5 h-2.5 rounded-full liquid-transition ${
               done
-                ? 'bg-[#8B7355]'
+                ? 'bg-primary'
                 : isToday
-                ? 'bg-[#C4A882] ring-2 ring-[#8B7355] ring-offset-2 ring-offset-[#F7F4EF] dark:ring-offset-[#16140F]'
-                : 'bg-[#EDE7DC] dark:bg-[#1E1B14]'
+                ? 'bg-muted-foreground/30 ring-2 ring-primary ring-offset-2 ring-offset-background'
+                : 'bg-muted'
             }`}
           />
         );

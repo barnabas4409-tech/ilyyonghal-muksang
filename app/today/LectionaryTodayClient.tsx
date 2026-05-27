@@ -57,13 +57,12 @@ export default function LectionaryTodayClient({ user, lectionary, existingReflec
   }
 
   async function handleShare() {
-    const tab = activeTab;
     const passage = lectionary ? {
       ot: lectionary.ot_passage,
       psalm: lectionary.psalm_passage,
       epistle: lectionary.epistle_passage,
       gospel: lectionary.gospel_passage,
-    }[tab] : '';
+    }[activeTab] : '';
     const text = `📖 ${passage}\n\n✍️ ${content}`;
     if (navigator.share) {
       await navigator.share({ text });
@@ -75,9 +74,9 @@ export default function LectionaryTodayClient({ user, lectionary, existingReflec
 
   if (!lectionary) {
     return (
-      <div className="flex flex-col min-h-dvh items-center justify-center px-5 text-center">
-        <p className="text-[#C4A882] text-sm">이번 주 성서정과를 준비 중입니다</p>
-        <p className="text-xs text-[#C4A882] mt-2 opacity-60">잠시 후 다시 확인해주세요</p>
+      <div className="flex flex-col min-h-dvh items-center justify-center px-5 text-center space-y-2">
+        <p className="text-sm text-muted-foreground">이번 주 성서정과를 준비 중입니다</p>
+        <p className="text-xs text-muted-foreground/60">잠시 후 다시 확인해주세요</p>
       </div>
     );
   }
@@ -94,53 +93,55 @@ export default function LectionaryTodayClient({ user, lectionary, existingReflec
   return (
     <div className="flex flex-col min-h-dvh">
       {/* 헤더 */}
-      <div className="px-5 pt-6 pb-3">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-[10px] text-[#8B7355] bg-[#EDE7DC] dark:bg-[#1E1B14] px-2 py-0.5 rounded-full font-medium">
+      <div className="px-5 pt-7 pb-4">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-[10px] font-medium text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full uppercase tracking-wide">
             교회력 성서정과
           </span>
           {lectionary.liturgical_year && (
-            <span className="text-[10px] text-[#C4A882]">
+            <span className="text-[10px] text-muted-foreground">
               {getLiturgicalYearLabel(lectionary.liturgical_year)}
             </span>
           )}
-          <span className="text-[10px] text-[#C4A882]">
+          <span className="text-[10px] text-muted-foreground">
             {BIBLE_VERSION_LABELS[bibleVersion]}
           </span>
         </div>
-        <h1 className="text-lg font-medium text-[#2C2416] dark:text-[#E8DCC8]">
+        <h1 className="text-lg font-medium text-foreground">
           {lectionary.week_name}
         </h1>
         {lectionary.season && (
-          <p className="text-xs text-[#C4A882] mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             {SEASON_LABELS[lectionary.season] ?? lectionary.season}
           </p>
         )}
       </div>
 
       {/* 탭 */}
-      <div className="flex px-5 gap-1 mb-4">
-        {(Object.keys(TAB_LABELS) as Tab[]).map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-2 text-xs font-medium rounded-xl transition-all ${
-              activeTab === tab
-                ? 'bg-[#8B7355] text-[#F7F4EF]'
-                : 'bg-[#EDE7DC] dark:bg-[#1E1B14] text-[#C4A882]'
-            }`}
-          >
-            {TAB_LABELS[tab]}
-          </button>
-        ))}
+      <div className="px-5 mb-5">
+        <div className="flex bg-muted/50 rounded-2xl p-1 gap-1">
+          {(Object.keys(TAB_LABELS) as Tab[]).map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 py-2 text-xs font-medium rounded-xl liquid-transition-fast ${
+                activeTab === tab
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground'
+              }`}
+            >
+              {TAB_LABELS[tab]}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* 본문 */}
-      <div className="mx-5 bg-[#EDE7DC] dark:bg-[#1E1B14] rounded-2xl p-5 mb-5">
-        <p className="text-xs text-[#8B7355] font-medium mb-3">
+      <div className="mx-5 card-float p-5 mb-5">
+        <p className="text-xs font-medium text-primary uppercase tracking-wide mb-3">
           {current.passage ?? '—'}
         </p>
-        <p className="font-serif-kr text-base leading-loose text-[#2C2416] dark:text-[#E8DCC8]">
+        <p className="font-serif-kr text-base leading-loose text-foreground">
           {current.content ?? '본문을 준비 중입니다'}
         </p>
       </div>
@@ -148,8 +149,8 @@ export default function LectionaryTodayClient({ user, lectionary, existingReflec
       {/* 묵상 질문 */}
       {lectionary.reflection_question && (
         <div className="px-5 mb-5">
-          <p className="text-xs text-[#8B7355] font-medium mb-2">묵상 질문</p>
-          <p className="text-sm text-[#2C2416] dark:text-[#E8DCC8] leading-relaxed">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">묵상 질문</p>
+          <p className="text-sm text-foreground leading-relaxed">
             {lectionary.reflection_question}
           </p>
         </div>
@@ -157,23 +158,25 @@ export default function LectionaryTodayClient({ user, lectionary, existingReflec
 
       {/* 묵상 작성 */}
       <div className="flex-1 px-5 mb-4">
-        <label className="block text-xs text-[#C4A882] mb-2">나의 묵상</label>
-        <textarea
-          value={content}
-          onChange={e => setContent(e.target.value)}
-          placeholder="하나님이 오늘 내게 말씀하신 것을 기록해보세요..."
-          className="w-full min-h-[160px] bg-[#EDE7DC] dark:bg-[#1E1B14] rounded-2xl p-4 text-sm text-[#2C2416] dark:text-[#E8DCC8] placeholder-[#C4A882] focus:outline-none focus:ring-1 focus:ring-[#8B7355] transition-all"
-          rows={6}
-        />
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">나의 묵상</p>
+        <div className="card-float p-4">
+          <textarea
+            value={content}
+            onChange={e => setContent(e.target.value)}
+            placeholder="하나님이 오늘 내게 말씀하신 것을 기록해보세요..."
+            className="w-full min-h-[160px] bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
+            rows={6}
+          />
+        </div>
       </div>
 
       {/* 비로그인/익명 안내 */}
       {user?.is_anonymous && (
-        <div className="mx-5 mb-3 bg-[#EDE7DC] dark:bg-[#1E1B14] rounded-2xl px-4 py-3 flex items-center justify-between">
-          <p className="text-xs text-[#C4A882]">로그인하면 기기 간 동기화돼요</p>
+        <div className="mx-5 mb-3 card-float px-4 py-3 flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">로그인하면 기기 간 동기화돼요</p>
           <button
             onClick={() => router.push('/auth/login')}
-            className="text-xs text-[#8B7355] font-medium"
+            className="text-xs text-primary font-medium"
           >
             로그인 →
           </button>
@@ -185,14 +188,14 @@ export default function LectionaryTodayClient({ user, lectionary, existingReflec
         <button
           onClick={handleShare}
           disabled={!content.trim()}
-          className="flex-1 py-3.5 border border-[#8B7355] text-[#8B7355] rounded-2xl text-sm font-medium disabled:opacity-30 active:scale-[0.98] transition-all"
+          className="flex-1 py-3.5 border border-primary/30 text-primary rounded-2xl text-sm font-medium disabled:opacity-30 active:scale-[0.98] liquid-transition"
         >
           공유하기
         </button>
         <button
           onClick={handleSave}
           disabled={saving || !content.trim()}
-          className="flex-[2] py-3.5 bg-[#8B7355] text-[#F7F4EF] rounded-2xl text-sm font-medium disabled:opacity-40 active:scale-[0.98] transition-all"
+          className="flex-[2] py-3.5 bg-primary text-primary-foreground rounded-2xl text-sm font-medium disabled:opacity-40 active:scale-[0.98] liquid-transition"
         >
           {saving ? '저장 중...' : saved ? '저장됨 ✓' : '저장하기'}
         </button>

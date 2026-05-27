@@ -32,38 +32,42 @@ export default function HomeClient({
     <div className="flex flex-col min-h-dvh">
       <IllustrationBanner type={illustrationType} />
 
-      <div className="flex-1 px-5 py-6 space-y-6">
+      <div className="flex-1 px-5 py-7 space-y-7">
         {/* 날짜 */}
-        <p className="text-xs text-[#C4A882] tracking-widest uppercase">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
           {formatKoreanDate(today)}
         </p>
 
         {/* 성서정과 트랙 */}
         {readingTrack === 'lectionary' && lectionaryReading && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] text-[#8B7355] bg-[#EDE7DC] dark:bg-[#1E1B14] px-2 py-0.5 rounded-full font-medium">
+              <span className="text-[10px] font-medium text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full uppercase tracking-wide">
                 교회력 성서정과
               </span>
               {lectionaryReading.liturgical_year && (
-                <span className="text-[10px] text-[#C4A882]">
+                <span className="text-[10px] text-muted-foreground">
                   {getLiturgicalYearLabel(lectionaryReading.liturgical_year)}
                 </span>
               )}
-              <span className="text-[10px] text-[#C4A882]">
+              <span className="text-[10px] text-muted-foreground">
                 {BIBLE_VERSION_LABELS[bibleVersion]}
               </span>
             </div>
-            <p className="text-base font-medium text-[#2C2416] dark:text-[#E8DCC8]">
-              {lectionaryReading.week_name}
-            </p>
-            <p className="text-xs text-[#8B7355]">
-              {SEASON_LABELS[lectionaryReading.season] ?? lectionaryReading.season}
-            </p>
-            {/* 복음서 본문 요약 */}
-            <div className="space-y-1">
-              <p className="text-xs text-[#C4A882]">복음서 · {lectionaryReading.gospel_passage}</p>
-              <p className="font-serif-kr text-lg leading-relaxed text-[#2C2416] dark:text-[#E8DCC8]">
+            <div>
+              <p className="text-base font-medium text-foreground">
+                {lectionaryReading.week_name}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {SEASON_LABELS[lectionaryReading.season] ?? lectionaryReading.season}
+              </p>
+            </div>
+            {/* 복음서 본문 미리보기 */}
+            <div className="card-float p-5 space-y-2">
+              <p className="text-xs font-medium text-primary uppercase tracking-wide">
+                복음서 · {lectionaryReading.gospel_passage}
+              </p>
+              <p className="font-serif-kr text-base leading-loose text-foreground">
                 {lectionaryReading.gospel_content
                   ? lectionaryReading.gospel_content.slice(0, 80) + '...'
                   : '—'}
@@ -75,21 +79,21 @@ export default function HomeClient({
         {/* 큐레이션 트랙 */}
         {readingTrack !== 'lectionary' && (
           reading ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <p className="text-xs font-medium text-[#8B7355] tracking-wide uppercase">
+                <p className="text-xs font-medium text-primary uppercase tracking-wide">
                   {reading.passage}
                 </p>
-                <span className="text-[10px] text-[#C4A882] bg-[#EDE7DC] dark:bg-[#1E1B14] px-2 py-0.5 rounded-full">
+                <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                   {BIBLE_VERSION_LABELS[bibleVersion]}
                 </span>
               </div>
-              <p className="font-serif-kr text-xl leading-relaxed text-[#2C2416] dark:text-[#E8DCC8]">
+              <p className="font-serif-kr text-xl leading-loose text-foreground">
                 {getContent(reading, bibleVersion)}
               </p>
             </div>
           ) : (
-            <p className="text-sm text-[#C4A882]">오늘의 말씀을 준비 중입니다</p>
+            <p className="text-sm text-muted-foreground">오늘의 말씀을 준비 중입니다</p>
           )
         )}
 
@@ -99,26 +103,24 @@ export default function HomeClient({
             ? lectionaryReading?.reflection_question
             : reading?.reflection_question;
           return q ? (
-            <div className="bg-[#EDE7DC] dark:bg-[#1E1B14] rounded-2xl p-5">
-              <p className="text-xs text-[#8B7355] font-medium mb-2">오늘의 묵상 질문</p>
-              <p className="text-sm text-[#2C2416] dark:text-[#E8DCC8] leading-relaxed line-clamp-3">
-                {q}
-              </p>
+            <div className="card-float p-5 space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">오늘의 묵상 질문</p>
+              <p className="text-sm text-foreground leading-relaxed line-clamp-3">{q}</p>
             </div>
           ) : null;
         })()}
 
         {/* 스트릭 */}
         {user && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-[#C4A882]">
+              <p className="text-xs text-muted-foreground">
                 {streak?.current_streak
                   ? `${streak.current_streak}일 연속 묵상 중`
                   : '오늘 첫 묵상을 시작해보세요'}
               </p>
               {streak?.current_streak && streak.current_streak > 1 && (
-                <span className="text-xs text-[#8B7355] font-medium">🔥 {streak.current_streak}</span>
+                <span className="text-xs font-medium text-primary">{streak.current_streak}일 🔥</span>
               )}
             </div>
             <StreakDots reflectionDates={reflectionDates} />
@@ -126,10 +128,10 @@ export default function HomeClient({
         )}
 
         {/* CTA */}
-        <div className="pt-2">
+        <div className="pt-1">
           <Link
             href="/today"
-            className="block w-full text-center py-4 bg-[#8B7355] text-[#F7F4EF] rounded-2xl font-medium text-sm tracking-wide hover:bg-[#7A6245] active:scale-[0.98] transition-all"
+            className="block w-full text-center py-4 bg-primary text-primary-foreground rounded-2xl text-sm font-medium tracking-wide liquid-transition active:scale-[0.98]"
           >
             {reflectionDates.includes(today) ? '오늘 묵상 이어가기' : '묵상 시작하기'}
           </Link>

@@ -1,11 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { Profile, Streak, BibleVersion, ReadingTrack } from '@/types';
 import { BIBLE_VERSION_LABELS, READING_TRACK_LABELS } from '@/types';
 import SettingRow from '@/components/ui/SettingRow';
+
+type ThemeOption = 'light' | 'dark' | 'system';
+const THEME_LABELS: Record<ThemeOption, string> = { light: '라이트', dark: '다크', system: '시스템' };
 
 interface Props {
   profile: Profile | null;
@@ -20,12 +24,9 @@ function formatJoinDate(dateStr: string) {
 
 export default function ProfileClient({ profile, streak, totalReflections }: Props) {
   const router = useRouter();
-  const [bibleVersion, setBibleVersion] = useState<BibleVersion>(
-    profile?.bible_version ?? 'gaeyeok'
-  );
-  const [readingTrack, setReadingTrack] = useState<ReadingTrack>(
-    profile?.reading_track ?? 'lectionary'
-  );
+  const { theme, setTheme } = useTheme();
+  const [bibleVersion, setBibleVersion] = useState<BibleVersion>(profile?.bible_version ?? 'gaeyeok');
+  const [readingTrack, setReadingTrack] = useState<ReadingTrack>(profile?.reading_track ?? 'lectionary');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -74,36 +75,50 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
   return (
     <div className="flex flex-col min-h-dvh">
       {/* 헤더 */}
-      <div className="px-5 pt-10 pb-6 text-center">
-        <div className="w-16 h-16 rounded-full bg-[#EDE7DC] dark:bg-[#1E1B14] flex items-center justify-center mx-auto mb-4">
-          <span className="text-2xl">
-            {profile?.name ? profile.name[0] : '✝'}
-          </span>
+      <div className="px-5 pt-10 pb-7 text-center">
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+          <span className="text-2xl">{profile?.name ? profile.name[0] : '✝'}</span>
         </div>
-        <h1 className="text-lg font-medium text-[#2C2416] dark:text-[#E8DCC8]">
+        <h1 className="text-lg font-medium text-foreground">
           {profile?.name ?? '나의 묵상'}
         </h1>
         {profile?.created_at && (
-          <p className="text-xs text-[#C4A882] mt-1">
-            {formatJoinDate(profile.created_at)} 시작
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">{formatJoinDate(profile.created_at)} 시작</p>
         )}
       </div>
 
       {/* 통계 */}
-      <div className="mx-5 grid grid-cols-3 gap-3 mb-6">
+      <div className="mx-5 grid grid-cols-3 gap-2 mb-6">
         {stats.map(({ label, value, unit }) => (
-          <div key={label} className="bg-[#EDE7DC] dark:bg-[#1E1B14] rounded-2xl p-4 text-center">
-            <p className="text-2xl font-bold text-[#8B7355]">{value}</p>
-            <p className="text-[10px] text-[#C4A882] mt-0.5">{unit}</p>
-            <p className="text-[10px] text-[#C4A882]">{label}</p>
+          <div key={label} className="card-float p-4 text-center">
+            <p className="text-2xl font-bold text-primary">{value}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{unit}</p>
+            <p className="text-[10px] text-muted-foreground">{label}</p>
           </div>
         ))}
       </div>
 
+      {/* 화면 설정 */}
+      <div className="mx-5 card-float px-5 mb-4">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider pt-4 pb-3">화면</p>
+        <div className="flex bg-muted/50 rounded-2xl p-1 gap-1 mb-4">
+          {(['light', 'dark', 'system'] as ThemeOption[]).map(t => (
+            <button
+              key={t}
+              onClick={() => setTheme(t)}
+              className={`flex-1 py-2 text-xs font-medium rounded-xl liquid-transition-fast ${
+                theme === t ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground'
+              }`}
+            >
+              {THEME_LABELS[t]}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* 설정 */}
-      <div className="mx-5 bg-[#EDE7DC] dark:bg-[#1E1B14] rounded-2xl px-5 mb-4 divide-y divide-[#C4A882]/20">
-        <p className="text-xs font-semibold text-[#8B7355] tracking-widest uppercase pt-4 pb-2">
+      <div className="mx-5 card-float px-5 mb-4 divide-y divide-border/50">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider pt-4 pb-2">
           묵상 설정
         </p>
 
@@ -120,7 +135,7 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
           options={trackOptions}
           value={readingTrack}
           onChange={val => {
-            if (val !== 'lectionary') return; // 준비중 항목 클릭 방지
+            if (val !== 'lectionary') return;
             setReadingTrack(val);
           }}
         />
@@ -129,7 +144,7 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
           <button
             onClick={handleSaveSettings}
             disabled={saving}
-            className="w-full py-3 bg-[#8B7355] text-[#F7F4EF] rounded-xl text-sm font-medium disabled:opacity-50 active:scale-[0.98] transition-all"
+            className="w-full py-3 bg-primary text-primary-foreground rounded-xl text-sm font-medium disabled:opacity-50 active:scale-[0.98] liquid-transition"
           >
             {saving ? '저장 중...' : saved ? '저장됨 ✓' : '설정 저장'}
           </button>
@@ -137,16 +152,16 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
       </div>
 
       {/* 구독 */}
-      <div className="mx-5 bg-[#EDE7DC] dark:bg-[#1E1B14] rounded-2xl p-5 mb-4">
+      <div className="mx-5 card-float p-5 mb-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-[#2C2416] dark:text-[#E8DCC8]">구독</p>
-            <p className="text-xs text-[#C4A882] mt-0.5">
+            <p className="text-sm font-medium text-foreground">구독</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
               {profile?.subscription_tier === 'premium' ? '프리미엄' : '무료 플랜'}
             </p>
           </div>
           {profile?.subscription_tier !== 'premium' && (
-            <button className="text-xs text-[#8B7355] font-medium border border-[#8B7355] px-3 py-1.5 rounded-full">
+            <button className="text-xs text-primary font-medium border border-primary/30 px-3 py-1.5 rounded-full liquid-transition">
               업그레이드
             </button>
           )}
@@ -157,7 +172,7 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
       <div className="mx-5">
         <button
           onClick={handleSignOut}
-          className="w-full py-4 text-sm text-[#C4A882] hover:text-[#8B7355] transition-colors"
+          className="w-full py-4 text-sm text-muted-foreground hover:text-foreground liquid-transition"
         >
           로그아웃
         </button>
