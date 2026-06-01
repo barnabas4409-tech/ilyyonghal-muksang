@@ -8,13 +8,15 @@ export default function PrayerBlock({ readingId, existingReflection, userId }: P
   const [value, setValue] = useState(existingReflection?.prayer ?? '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function save() {
     if (!userId || !value.trim() || saving) return;
     setSaving(true);
+    setError(null);
     const supabase = createClient();
 
-    await supabase
+    const { error: err } = await supabase
       .from('reflections')
       .upsert(
         {
@@ -27,6 +29,10 @@ export default function PrayerBlock({ readingId, existingReflection, userId }: P
       );
 
     setSaving(false);
+    if (err) {
+      setError(err.message);
+      return;
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -52,6 +58,9 @@ export default function PrayerBlock({ readingId, existingReflection, userId }: P
       <div className="flex items-center justify-end mt-2 h-4">
         {saving && <p className="text-[10px] text-muted-foreground/60">저장 중...</p>}
         {saved && !saving && <p className="text-[10px] text-primary">기도가 보존되었어요</p>}
+        {error && !saving && (
+          <p className="text-[10px] text-orange-600 dark:text-orange-400">저장 실패: {error}</p>
+        )}
       </div>
     </div>
   );

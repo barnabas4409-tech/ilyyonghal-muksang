@@ -8,13 +8,15 @@ export default function PracticeBlock({ readingId, existingReflection, userId }:
   const [value, setValue] = useState(existingReflection?.practice ?? '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function save() {
     if (!userId || !value.trim() || saving) return;
     setSaving(true);
+    setError(null);
     const supabase = createClient();
 
-    await supabase
+    const { error: err } = await supabase
       .from('reflections')
       .upsert(
         {
@@ -27,6 +29,10 @@ export default function PracticeBlock({ readingId, existingReflection, userId }:
       );
 
     setSaving(false);
+    if (err) {
+      setError(err.message);
+      return;
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -55,6 +61,9 @@ export default function PracticeBlock({ readingId, existingReflection, userId }:
       <div className="flex items-center justify-end mt-2 h-4">
         {saving && <p className="text-[10px] text-muted-foreground/60">저장 중...</p>}
         {saved && !saving && <p className="text-[10px] text-primary">실천이 기록되었어요</p>}
+        {error && !saving && (
+          <p className="text-[10px] text-orange-600 dark:text-orange-400">저장 실패: {error}</p>
+        )}
       </div>
     </div>
   );

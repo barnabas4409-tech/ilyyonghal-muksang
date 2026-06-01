@@ -9,6 +9,7 @@ export default function OneLineBlock({ readingId, existingReflection, userId }: 
   const [editing, setEditing] = useState(!existingReflection?.one_line_word);
   const [saved, setSaved] = useState<boolean>(!!existingReflection?.one_line_word);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -22,9 +23,10 @@ export default function OneLineBlock({ readingId, existingReflection, userId }: 
   async function save() {
     if (!userId || !value.trim() || saving) return;
     setSaving(true);
+    setError(null);
     const supabase = createClient();
 
-    await supabase
+    const { error: err } = await supabase
       .from('reflections')
       .upsert(
         {
@@ -37,6 +39,10 @@ export default function OneLineBlock({ readingId, existingReflection, userId }: 
       );
 
     setSaving(false);
+    if (err) {
+      setError(err.message);
+      return;
+    }
     setSaved(true);
     setEditing(false);
   }
@@ -83,6 +89,11 @@ export default function OneLineBlock({ readingId, existingReflection, userId }: 
               {saving ? '받는 중...' : saved ? '다시 받기' : '받았습니다'}
             </button>
           </div>
+          {error && (
+            <p className="text-[10px] text-orange-600 dark:text-orange-400 text-center px-2">
+              저장 실패: {error}
+            </p>
+          )}
         </div>
       )}
     </div>

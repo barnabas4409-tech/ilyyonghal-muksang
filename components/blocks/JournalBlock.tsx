@@ -16,6 +16,7 @@ export default function JournalBlock({ readingId, reflectionQuestion, existingRe
   const [saved, setSaved] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [reflectionId, setReflectionId] = useState(existingReflection?.id ?? null);
+  const [error, setError] = useState<string | null>(null);
 
   function addTag(raw: string) {
     const tag = raw.replace(/^#/, '').trim();
@@ -36,9 +37,10 @@ export default function JournalBlock({ readingId, reflectionQuestion, existingRe
   async function handleSave() {
     if (!content.trim() || !userId) return;
     setSaving(true);
+    setError(null);
     const supabase = createClient();
 
-    const { data } = await supabase
+    const { data, error: err } = await supabase
       .from('reflections')
       .upsert(
         {
@@ -54,8 +56,12 @@ export default function JournalBlock({ readingId, reflectionQuestion, existingRe
       .select()
       .single();
 
-    if (data) setReflectionId(data.id);
     setSaving(false);
+    if (err) {
+      setError(err.message);
+      return;
+    }
+    if (data) setReflectionId(data.id);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -133,7 +139,7 @@ export default function JournalBlock({ readingId, reflectionQuestion, existingRe
         </div>
       </div>
 
-      <div className="px-5 pb-4 flex gap-3">
+      <div className="px-5 pb-2 flex gap-3">
         <button
           onClick={handleShare}
           disabled={!content.trim() || sharing}
@@ -149,6 +155,12 @@ export default function JournalBlock({ readingId, reflectionQuestion, existingRe
           {saving ? '저장 중...' : saved ? '저장됨 ✓' : '저장하기'}
         </button>
       </div>
+
+      {error && (
+        <p className="text-[11px] text-orange-600 dark:text-orange-400 px-5 pb-3">
+          저장 실패: {error}
+        </p>
+      )}
 
       {/* 저장 후: 소그룹 인증 or 참여 유도 */}
       {reflectionId && (

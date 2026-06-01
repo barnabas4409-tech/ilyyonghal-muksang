@@ -8,13 +8,14 @@ export default function GratitudeBlock({ readingId, existingReflection, userId }
   const [value, setValue] = useState(existingReflection?.extras?.gratitude ?? '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function save() {
     if (!userId || !value.trim() || saving) return;
     setSaving(true);
+    setError(null);
     const supabase = createClient();
 
-    // 기존 extras 읽어와서 병합 (다른 블록 데이터 보존)
     const { data: current } = await supabase
       .from('reflections')
       .select('extras')
@@ -27,7 +28,7 @@ export default function GratitudeBlock({ readingId, existingReflection, userId }
       gratitude: value.trim(),
     };
 
-    await supabase.from('reflections').upsert(
+    const { error: err } = await supabase.from('reflections').upsert(
       {
         user_id: userId,
         reading_id: readingId,
@@ -38,6 +39,10 @@ export default function GratitudeBlock({ readingId, existingReflection, userId }
     );
 
     setSaving(false);
+    if (err) {
+      setError(err.message);
+      return;
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -63,6 +68,9 @@ export default function GratitudeBlock({ readingId, existingReflection, userId }
       <div className="flex items-center justify-end mt-2 h-4">
         {saving && <p className="text-[10px] text-muted-foreground/60">저장 중...</p>}
         {saved && !saving && <p className="text-[10px] text-primary">감사가 기록되었어요</p>}
+        {error && !saving && (
+          <p className="text-[10px] text-orange-600 dark:text-orange-400">저장 실패: {error}</p>
+        )}
       </div>
     </div>
   );
