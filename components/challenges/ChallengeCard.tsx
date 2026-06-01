@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import type { Challenge, ChallengeLog } from '@/types';
 import { CATEGORY_META, streakMessage } from '@/lib/challenges';
@@ -25,7 +26,9 @@ export default function ChallengeCard({
     ? `${challenge.target_value}${challenge.target_unit ?? ''}`
     : null;
 
-  async function toggle() {
+  async function toggle(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
     if (busy) return;
     setBusy(true);
     setError(null);
@@ -44,7 +47,7 @@ export default function ChallengeCard({
           challenge_id: challenge.id,
           user_id: userId,
           date: todayKst,
-          value: challenge.target_value, // 기본값으로 target 사용
+          value: challenge.target_value,
         });
       if (err) setError(err.message);
     }
@@ -53,18 +56,20 @@ export default function ChallengeCard({
     if (!error) onChange();
   }
 
-  const message = streakMessage(currentStreak + (done ? 0 : 0), done, challenge.category);
+  const message = streakMessage(currentStreak, done, challenge.category);
 
   return (
-    <button
-      onClick={toggle}
-      disabled={busy}
-      className="w-full flex items-center gap-3 py-3 px-3 -mx-3 rounded-xl liquid-transition-fast active:bg-muted/40 disabled:opacity-50"
+    <Link
+      href={`/challenges/${challenge.id}`}
+      className="flex items-center gap-3 py-3 px-3 -mx-3 rounded-xl liquid-transition-fast hover:bg-muted/40 active:bg-muted/60"
     >
-      {/* 토글 원 */}
-      <div
-        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 liquid-transition-fast ${
-          done ? 'bg-primary border-primary' : 'border-border'
+      {/* 토글 원 — 클릭 시 토글만 (상세 진입 X) */}
+      <button
+        onClick={toggle}
+        disabled={busy}
+        aria-label={done ? '완료 취소' : '완료 표시'}
+        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 liquid-transition-fast disabled:opacity-50 ${
+          done ? 'bg-primary border-primary' : 'border-border hover:border-primary/60'
         }`}
       >
         {done && (
@@ -72,13 +77,13 @@ export default function ChallengeCard({
             <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )}
-      </div>
+      </button>
 
       {/* 이모지 */}
       <span className="text-lg shrink-0">{emoji}</span>
 
       {/* 이름 + 메시지 */}
-      <div className="flex-1 min-w-0 text-left">
+      <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2">
           <p
             className={`text-sm font-medium truncate liquid-transition-fast ${
@@ -93,6 +98,7 @@ export default function ChallengeCard({
         </div>
         <p className="text-[11px] text-muted-foreground/70 mt-0.5">
           {message}
+          {error && <span className="text-orange-600 dark:text-orange-400 ml-2">· {error}</span>}
         </p>
       </div>
 
@@ -103,6 +109,9 @@ export default function ChallengeCard({
           <span className="font-medium">{currentStreak}</span>
         </div>
       )}
-    </button>
+
+      {/* chevron — 상세 진입 힌트 */}
+      <span className="text-muted-foreground/30 text-xs shrink-0">→</span>
+    </Link>
   );
 }
