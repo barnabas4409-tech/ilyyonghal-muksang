@@ -7,39 +7,49 @@
 /* Class-based dark mode (next-themes adds .dark to <html>) */
 @custom-variant dark (&:is(.dark, .dark *));
 
-/* ── HSL design tokens ── */
+/* ──────────────────────────────────────────────
+   DESIGN SYSTEM — Spiritual Formation OS
+   Light: warm off-white, sacred but not parchment
+   Dark:  prayer-dusk — deep warm dusk, contemplative
+   Primary accent: warm brown (lightens toward gold in dark)
+────────────────────────────────────────────── */
+
 :root {
-  /* Warm parchment palette */
-  --background:        38 34% 95%;   /* #F7F4EF */
-  --foreground:        38 34% 13%;   /* #2C2416 */
-  --card:              39 32% 90%;   /* #EDE7DC */
-  --card-foreground:   38 34% 13%;
-  --muted:             38 28% 92%;
-  --muted-foreground:  35 36% 64%;   /* #C4A882 */
-  --primary:           33 24% 44%;   /* #8B7355 */
-  --primary-foreground: 38 34% 95%;
-  --accent:            35 30% 78%;
-  --accent-foreground: 38 34% 13%;
-  --border:            39 22% 84%;
-  --input:             39 22% 84%;
-  --ring:              33 24% 44%;
-  --radius:            1rem;
+  --background:         38 20% 97%;    /* ~#F8F7F4 */
+  --foreground:         30 18%  8%;    /* ~#171411 */
+  --card:                0  0% 100%;
+  --card-foreground:    30 18%  8%;
+  --muted:              38 14% 92%;    /* ~#EAE7E1 */
+  --muted-foreground:   25 10% 42%;    /* ~#6E6560 — WCAG AA */
+  --primary:            33 24% 44%;    /* #8B7355 */
+  --primary-foreground:  0  0% 100%;
+  --border:             35 14% 86%;    /* ~#DDD8D0 */
+  --input:              35 14% 86%;
+  --ring:               33 24% 44%;
+  --radius:             0.875rem;
+
+  /* Motion */
+  --duration-fast:   200ms;
+  --duration-base:   300ms;
+  --duration-slow:   500ms;
+  --duration-slower: 700ms;
+  --ease-out-soft:   cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-soft:    cubic-bezier(0.4, 0, 0.6, 1);
 }
 
+/* Prayer Dusk — 따뜻한 황혼색 톤 */
 .dark {
-  --background:        42 19%  7%;   /* #16140F */
-  --foreground:        38 41% 85%;   /* #E8DCC8 */
-  --card:              42 20% 10%;   /* #1E1B14 */
-  --card-foreground:   38 41% 85%;
-  --muted:             42 18% 14%;
-  --muted-foreground:  35 22% 45%;   /* ~#6B5B45 */
-  --primary:           33 24% 44%;   /* #8B7355 stays same */
-  --primary-foreground: 38 41% 85%;
-  --accent:            35 20% 25%;
-  --accent-foreground: 38 41% 85%;
-  --border:            42 16% 20%;
-  --input:             42 16% 20%;
-  --ring:              33 24% 44%;
+  --background:         25 12%  6%;    /* deeper warm dusk ~#100D0A */
+  --foreground:         38 22% 92%;    /* ~#F0EAE0 — warmer */
+  --card:               25 10% 11%;    /* ~#1F1B16 */
+  --card-foreground:    38 22% 92%;
+  --muted:              25 10% 16%;    /* ~#2D2924 */
+  --muted-foreground:   30 12% 62%;    /* ~#A39A8E */
+  --primary:            36 38% 60%;    /* warmer gold accent */
+  --primary-foreground: 25 12%  6%;
+  --border:             25  9% 19%;    /* ~#36322C */
+  --input:              25  9% 19%;
+  --ring:               36 38% 60%;
 }
 
 /* ── Tailwind v4 semantic utilities ── */
@@ -52,8 +62,6 @@
   --color-muted-foreground:  hsl(var(--muted-foreground));
   --color-primary:           hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-accent:            hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
   --color-border:            hsl(var(--border));
   --color-input:             hsl(var(--input));
   --color-ring:              hsl(var(--ring));
@@ -69,30 +77,25 @@
 }
 
 /* ── Base ── */
-* {
-  -webkit-tap-highlight-color: transparent;
-}
+* { -webkit-tap-highlight-color: transparent; }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  max-width: 430px;
-  margin: 0 auto;
   min-height: 100dvh;
 }
 
-textarea {
-  resize: none;
-}
+textarea { resize: none; }
+::-webkit-scrollbar { display: none; }
 
-::-webkit-scrollbar {
-  display: none;
+/* 입력 포커스: 부드러운 ring */
+input:focus,
+textarea:focus {
+  outline: none;
 }
 
 /* ── Typography ── */
@@ -101,45 +104,139 @@ textarea {
   font-weight: 300;
 }
 
-/* Comfortable reading column — centres prose within the 430px body */
-.reading-layout {
-  width: 100%;
-  padding-inline: 1.25rem;
-}
-
-/* iOS safe area */
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
 /* ── Component utilities ── */
 
-/* Card: borderless, floats above background */
+/* card-float: 입력/콘텐츠 카드 — 부드러운 lift */
 .card-float {
   border-radius: calc(var(--radius) + 4px);
-  background: hsl(var(--muted) / 0.35);
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.card-float:hover {
-  background: hsl(var(--muted) / 0.55);
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  box-shadow:
+    0 1px 2px hsl(0 0% 0% / 0.04),
+    0 2px 8px hsl(0 0% 0% / 0.04);
+  transition: box-shadow var(--duration-base) var(--ease-out-soft),
+              border-color var(--duration-base) var(--ease-out-soft),
+              transform var(--duration-base) var(--ease-out-soft);
 }
 
-/* Primary action button with warm gradient */
+.dark .card-float {
+  box-shadow:
+    0 1px 4px hsl(0 0% 0% / 0.35),
+    0 4px 16px hsl(0 0% 0% / 0.28);
+}
+
+/* button.card-float (클릭 가능한 카드) */
+button.card-float:hover,
+a.card-float:hover {
+  border-color: hsl(var(--primary) / 0.3);
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 6px hsl(0 0% 0% / 0.06),
+    0 6px 18px hsl(0 0% 0% / 0.06);
+}
+.dark button.card-float:hover,
+.dark a.card-float:hover {
+  border-color: hsl(var(--primary) / 0.35);
+  box-shadow:
+    0 2px 8px hsl(0 0% 0% / 0.4),
+    0 8px 24px hsl(0 0% 0% / 0.32);
+}
+
+/* Primary action button */
 .btn-gold {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(35 30% 55%) 100%);
+  background: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
-  box-shadow: 0 2px 12px hsl(var(--primary) / 0.25);
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 2px 10px hsl(var(--primary) / 0.28);
+  transition: all var(--duration-base) var(--ease-out-soft);
 }
 .btn-gold:hover {
-  box-shadow: 0 4px 20px hsl(var(--primary) / 0.35);
+  box-shadow: 0 6px 22px hsl(var(--primary) / 0.42);
+  filter: brightness(1.06);
   transform: translateY(-1px);
 }
-
-/* Smooth easing for interactive elements */
-.liquid-transition {
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+.btn-gold:active {
+  transform: translateY(0);
 }
-.liquid-transition-fast {
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+
+/* Smooth easing */
+.liquid-transition      { transition: all var(--duration-base) var(--ease-out-soft); }
+.liquid-transition-fast { transition: all var(--duration-fast) var(--ease-out-soft); }
+.liquid-transition-slow { transition: all var(--duration-slow) var(--ease-out-soft); }
+
+/* iOS safe areas */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+.pt-safe { padding-top: env(safe-area-inset-top); }
+
+/* ── Sacred typography blockquote ── */
+.sacred-quote {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: 1.25rem;
+  line-height: 1.85;
+  color: hsl(var(--foreground));
+}
+
+/* ── Celebration ── */
+@keyframes celebrate-in {
+  0%   { opacity: 0; transform: scale(0.85) translateY(8px); }
+  60%  { opacity: 1; transform: scale(1.03) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes celebrate-out {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95) translateY(-6px); }
+}
+@keyframes particle-float {
+  0%   { transform: translateY(0) rotate(0deg) scale(1);   opacity: 1; }
+  100% { transform: translateY(-90px) rotate(45deg) scale(0.4); opacity: 0; }
+}
+@keyframes streak-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(33 80% 55% / 0); }
+  50%       { box-shadow: 0 0 0 6px hsl(33 80% 55% / 0.2); }
+}
+@keyframes streak-pulse-icon {
+  0%, 100% { transform: scale(1);   filter: drop-shadow(0 0 0 hsl(20 90% 55% / 0)); }
+  50%       { transform: scale(1.08); filter: drop-shadow(0 0 12px hsl(20 90% 55% / 0.55)); }
+}
+@keyframes streak-glow {
+  0%, 100% { filter: drop-shadow(0 0 0 hsl(33 50% 60% / 0)); }
+  50%       { filter: drop-shadow(0 0 8px hsl(33 60% 60% / 0.35)); }
+}
+@keyframes soft-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-celebrate-in      { animation: celebrate-in  0.5s var(--ease-out-soft) forwards; }
+.animate-celebrate-out     { animation: celebrate-out 0.35s ease-in forwards; }
+.animate-streak-pulse      { animation: streak-pulse 2s ease-in-out infinite; }
+.animate-streak-pulse-icon { animation: streak-pulse-icon 1.6s ease-in-out infinite; }
+.animate-streak-glow       { animation: streak-glow 3s ease-in-out infinite; }
+.animate-soft-fade-in      { animation: soft-fade-in 0.4s var(--ease-out-soft) forwards; }
+
+/* 로딩 skeleton — shimmer */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted) / 0.4) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+/* Reduced motion — accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

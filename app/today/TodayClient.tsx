@@ -23,6 +23,7 @@ export default function TodayClient({ user, reading, existingReflection, bibleVe
   const [highlighted, setHighlighted] = useState(existingReflection?.highlighted_sentence ?? '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const [reflectionId, setReflectionId] = useState(existingReflection?.id ?? null);
 
   useEffect(() => {
@@ -68,12 +69,19 @@ export default function TodayClient({ user, reading, existingReflection, bibleVe
   }
 
   async function handleShare() {
-    const text = `📖 ${reading?.passage}\n\n${reading?.content}\n\n✍️ ${content}`;
-    if (navigator.share) {
-      await navigator.share({ text });
-    } else {
-      await navigator.clipboard.writeText(text);
-      alert('묵상이 클립보드에 복사되었습니다.');
+    if (!content.trim() || sharing) return;
+    setSharing(true);
+    try {
+      const text = `📖 ${reading?.passage}\n\n✍️ ${content}`;
+      if (navigator.share) {
+        await navigator.share({ text });
+      } else {
+        await navigator.clipboard.writeText(text);
+      }
+    } catch (err) {
+      if (!(err instanceof Error && err.name === 'AbortError')) console.error(err);
+    } finally {
+      setSharing(false);
     }
   }
 
@@ -153,10 +161,10 @@ export default function TodayClient({ user, reading, existingReflection, bibleVe
       <div className="px-5 pb-4 flex gap-3">
         <button
           onClick={handleShare}
-          disabled={!content.trim()}
+          disabled={!content.trim() || sharing}
           className="flex-1 py-3.5 border border-primary/30 text-primary rounded-2xl text-sm font-medium disabled:opacity-30 active:scale-[0.98] liquid-transition"
         >
-          공유하기
+          {sharing ? '공유 중...' : '공유하기'}
         </button>
         <button
           onClick={handleSave}

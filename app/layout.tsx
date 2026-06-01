@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import BottomNav from '@/components/layout/BottomNav';
+import SideNav from '@/components/layout/SideNav';
 import AuthProvider from '@/components/layout/AuthProvider';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
 
@@ -24,16 +25,12 @@ export const viewport: Viewport = {
   userScalable: false,
   viewportFit: 'cover',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#F7F4EF' },
-    { media: '(prefers-color-scheme: dark)',  color: '#16140F' },
+    { media: '(prefers-color-scheme: light)', color: '#F8F7F4' },
+    { media: '(prefers-color-scheme: dark)',  color: '#100D0A' },
   ],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
@@ -43,10 +40,21 @@ export default function RootLayout({
       <body className="min-h-dvh flex flex-col bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
-            <main className="flex-1 pb-20">
-              {children}
-            </main>
-            <BottomNav />
+            <div className="flex min-h-dvh w-full">
+              {/* 데스크탑 사이드바 */}
+              <SideNav />
+
+              {/* 콘텐츠 영역 */}
+              <div className="flex flex-col flex-1 min-w-0">
+                <main className="flex-1 pb-20 lg:pb-0">
+                  {/* 모바일: 꽉 채움 / 데스크탑: 중앙 최대 너비 */}
+                  <div className="w-full max-w-[430px] mx-auto lg:max-w-2xl">
+                    {children}
+                  </div>
+                </main>
+                <BottomNav />
+              </div>
+            </div>
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -1,5 +1,6 @@
 export type BibleVersion = 'gaeyeok' | 'gongdong' | 'catholic';
 export type ReadingTrack = 'curated' | 'lectionary' | 'chronological';
+export type MeditationMode = 'simple' | 'standard' | 'deep';
 
 export const BIBLE_VERSION_LABELS: Record<BibleVersion, string> = {
   gaeyeok: '개역개정',
@@ -8,9 +9,15 @@ export const BIBLE_VERSION_LABELS: Record<BibleVersion, string> = {
 };
 
 export const READING_TRACK_LABELS: Record<ReadingTrack, string> = {
-  curated: '앱 큐레이션',
+  curated: '일용할 묵상',
   lectionary: '교회력 성서정과',
   chronological: '1년 통독',
+};
+
+export const MEDITATION_MODE_LABELS: Record<MeditationMode, string> = {
+  simple: '간단히',
+  standard: '기본',
+  deep: '깊이',
 };
 
 export interface Profile {
@@ -26,6 +33,7 @@ export interface Profile {
   push_token: string | null;
   bible_version: BibleVersion;
   reading_track: ReadingTrack;
+  meditation_mode: MeditationMode;
 }
 
 export interface DailyReading {
@@ -47,11 +55,16 @@ export interface Reflection {
   user_id: string;
   reading_id: string;
   title: string | null;
-  content: string;
+  content: string | null;
   highlighted_sentence: string | null;
   is_public: boolean;
   created_at: string;
   updated_at: string;
+  one_line_word: string | null;
+  prayer: string | null;
+  practice: string | null;
+  extras?: { gratitude?: string; freenote?: string } | null;
+  tags?: string[];
   daily_readings?: DailyReading;
 }
 

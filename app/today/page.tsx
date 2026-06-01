@@ -1,9 +1,44 @@
 import { createClient } from '@/lib/supabase/server';
 import TodayClient from './TodayClient';
-import LectionaryTodayClient from './LectionaryTodayClient';
-import type { DailyReading, Reflection, BibleVersion, LectionaryReading } from '@/types';
+import BlockRenderer from '@/components/blocks/BlockRenderer';
+import type { DailyReading, Reflection, BibleVersion, LectionaryReading, MeditationMode } from '@/types';
+import type { MeditationBlock } from '@/types/blocks';
 import { getTodayDateString } from '@/utils/date';
-import { getSundayOf } from '@/utils/lectionary';
+import { normalizeBlocks, type BlockConfig } from '@/lib/blockFlow';
+import EmptyState from '@/components/ui/EmptyState';
+import AnonymousNotice from '@/components/ui/AnonymousNotice';
+
+interface JournalProps {
+  readingId: string;
+  reflectionQuestion: string | null;
+  existingReflection: Reflection | null;
+  userId: string | null;
+  isAnonymous: boolean;
+  groupId: string | null;
+}
+
+function configToBlock(cfg: BlockConfig, p: JournalProps): MeditationBlock {
+  switch (cfg.type) {
+    case 'quote':     return { type: 'quote' };
+    case 'silence':   return { type: 'silence', defaultDuration: (cfg.mins ?? 5) * 60 };
+    case 'journal':   return { type: 'journal', ...p };
+    case 'oneline':   return { type: 'oneline',   readingId: p.readingId, existingReflection: p.existingReflection, userId: p.userId };
+    case 'prayer':    return { type: 'prayer',    readingId: p.readingId, existingReflection: p.existingReflection, userId: p.userId };
+    case 'practice':  return { type: 'practice',  readingId: p.readingId, existingReflection: p.existingReflection, userId: p.userId };
+    case 'gratitude': return { type: 'gratitude', readingId: p.readingId, existingReflection: p.existingReflection, userId: p.userId };
+    case 'freenote':  return { type: 'freenote',  readingId: p.readingId, existingReflection: p.existingReflection, userId: p.userId };
+  }
+}
+
+function buildBlocks(
+  mode: MeditationMode,
+  scriptureBlock: MeditationBlock,
+  journalProps: JournalProps,
+  custom: unknown,
+): MeditationBlock[] {
+  const flow = normalizeBlocks(custom as never, mode);
+  return [scriptureBlock, ...flow.map((cfg) => configToBlock(cfg, journalProps))];
+}
 
 export default async function TodayPage() {
   const supabase = await createClient();
@@ -12,23 +47,34 @@ export default async function TodayPage() {
   const today = getTodayDateString();
   let bibleVersion: BibleVersion = 'gaeyeok';
   let readingTrack = 'lectionary';
+  let meditationMode: MeditationMode = 'standard';
+  let groupId: string | null = null;
+  let customBlocks: unknown = null;
 
   if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('bible_version, reading_track')
-      .eq('id', user.id)
-      .single();
+    const [profileResult, groupResult] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('bible_version, reading_track, meditation_mode, custom_blocks')
+        .eq('id', user.id)
+        .single(),
+      supabase
+        .from('group_members')
+        .select('group_id')
+        .eq('user_id', user.id)
+        .limit(1)
+        .single(),
+    ]);
 
-    if (profile?.bible_version) bibleVersion = profile.bible_version;
-    if (profile?.reading_track) readingTrack = profile.reading_track;
+    if (profileResult.data?.bible_version) bibleVersion = profileResult.data.bible_version;
+    if (profileResult.data?.reading_track) readingTrack = profileResult.data.reading_track;
+    if (profileResult.data?.meditation_mode) meditationMode = profileResult.data.meditation_mode;
+    customBlocks = profileResult.data?.custom_blocks ?? null;
+    if (groupResult.data?.group_id) groupId = groupResult.data.group_id;
   }
 
   // 성서정과 트랙
   if (readingTrack === 'lectionary') {
-    const sundayDate = getSundayOf(new Date(today));
-
-    // 이번 주 일요일 기준, 없으면 가장 최근 주일
     const { data: lectionary } = await supabase
       .from('lectionary_readings')
       .select('*')
@@ -37,8 +83,17 @@ export default async function TodayPage() {
       .limit(1)
       .single<LectionaryReading>();
 
+    if (!lectionary) {
+      return (
+        <EmptyState
+          title="이번 주 성서정과를 준비 중입니다"
+          hint="잠시 후 다시 확인해주세요"
+        />
+      );
+    }
+
     let existingReflection: Reflection | null = null;
-    if (lectionary && user) {
+    if (user) {
       const { data } = await supabase
         .from('reflections')
         .select('*')
@@ -48,17 +103,63 @@ export default async function TodayPage() {
       existingReflection = data;
     }
 
+    const isAnon = user?.is_anonymous ?? true;
     return (
-      <LectionaryTodayClient
-        user={user}
-        lectionary={lectionary}
-        existingReflection={existingReflection}
-        bibleVersion={bibleVersion}
-      />
+      <>
+        {isAnon && <AnonymousNotice />}
+        <BlockRenderer blocks={buildBlocks(
+          meditationMode,
+          { type: 'scripture', lectionary, bibleVersion },
+          { readingId: lectionary.id, reflectionQuestion: lectionary.reflection_question, existingReflection, userId: user?.id ?? null, isAnonymous: isAnon, groupId },
+          customBlocks,
+        )} />
+      </>
     );
   }
 
-  // 큐레이션 / 통독 트랙
+  // 일용할 묵상 트랙
+  if (readingTrack === 'curated') {
+    const { data: reading } = await supabase
+      .from('daily_readings')
+      .select('*')
+      .eq('date', today)
+      .single<DailyReading>();
+
+    if (!reading) {
+      return (
+        <EmptyState
+          title="오늘의 말씀을 준비 중입니다"
+          hint="잠시 후 다시 확인해주세요"
+        />
+      );
+    }
+
+    let existingReflection: Reflection | null = null;
+    if (user) {
+      const { data } = await supabase
+        .from('reflections')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('reading_id', reading.id)
+        .single<Reflection>();
+      existingReflection = data;
+    }
+
+    const isAnon = user?.is_anonymous ?? true;
+    return (
+      <>
+        {isAnon && <AnonymousNotice />}
+        <BlockRenderer blocks={buildBlocks(
+          meditationMode,
+          { type: 'dailyScripture', reading, bibleVersion },
+          { readingId: reading.id, reflectionQuestion: reading.reflection_question, existingReflection, userId: user?.id ?? null, isAnonymous: isAnon, groupId },
+          customBlocks,
+        )} />
+      </>
+    );
+  }
+
+  // 통독 트랙 (준비중)
   const { data: reading } = await supabase
     .from('daily_readings')
     .select('*')

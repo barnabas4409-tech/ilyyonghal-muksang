@@ -38,7 +38,7 @@ const navItems = [
   },
   {
     href: '/journal',
-    label: '기록',
+    label: '여정',
     icon: (active: boolean) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
         <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -74,10 +74,10 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border pb-safe">
-      <div className="max-w-lg mx-auto flex items-center justify-around px-4 py-2">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border pb-safe">
+      <div className="max-w-[430px] mx-auto flex items-center justify-around px-4 py-2">
         {navItems.map(({ href, label, icon }) => {
-          const active = pathname === href;
+          const active = pathname === href || (href === '/' && pathname.startsWith('/group'));
           return (
             <Link
               key={href}

@@ -9,7 +9,7 @@ export default async function JournalPage() {
   if (user) {
     const { data } = await supabase
       .from('reflections')
-      .select(`*, daily_readings (date, passage, title)`)
+      .select(`*, daily_readings (date, passage, title), lectionary_readings (sunday_date, week_name, gospel_passage)`)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 

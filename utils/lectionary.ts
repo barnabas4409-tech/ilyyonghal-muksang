@@ -7,7 +7,7 @@ export function getSundayOf(date: Date): string {
 }
 
 export function getLiturgicalYearLabel(year: 'A' | 'B' | 'C'): string {
-  return { A: '가해', B: '나해', C: '다해' }[year];
+  return { A: '가해 (A년)', B: '나해 (B년)', C: '다해 (C년)' }[year];
 }
 
 export const SEASON_LABELS: Record<string, string> = {
