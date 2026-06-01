@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import type { User } from '@supabase/supabase-js';
-import type { BibleVersion, ReadingTrack } from '@/types';
+import type { BibleVersion, ReadingTrack, Challenge, ChallengeLog } from '@/types';
+import ChallengeList from '@/components/challenges/ChallengeList';
 
 interface Props {
   user: User | null;
@@ -18,6 +19,10 @@ interface Props {
   userGroup: { id: string; name: string; todayCount: number } | null;
   recentWords: { id: string; one_line_word: string; created_at: string }[];
   todayVerse: { passage: string; text: string } | null;
+  challenges: Challenge[];
+  todayLogs: ChallengeLog[];
+  challengeStreaks: Record<string, number>;
+  todayKst: string;
 }
 
 function greetingSub(name: string | null): string {
@@ -158,6 +163,7 @@ function JourneyList({ hasReflection, hasCheckIn, hasGroup }: {
 export default function HomeClient({
   user, userName, todayLabel,
   hasReflectionToday, hasCheckInToday, streakCount, userGroup, recentWords, todayVerse,
+  challenges, todayLogs, challengeStreaks, todayKst,
 }: Props) {
   const sub = greetingSub(userName);
   const [showCelebration, setShowCelebration] = useState(false);
@@ -239,6 +245,22 @@ export default function HomeClient({
               hasReflection={hasReflectionToday}
               hasCheckIn={hasCheckInToday}
               hasGroup={!!userGroup}
+            />
+          </section>
+        )}
+
+        {/* 함께 걷는 훈련 — 챌린지. 묵상은 위에 있음, 여기는 동반 훈련 */}
+        {user && !user.is_anonymous && (
+          <section className="pt-2 border-t border-border/40">
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-[0.18em] mb-4">
+              함께 걷는 훈련
+            </p>
+            <ChallengeList
+              challenges={challenges}
+              logs={todayLogs}
+              streaks={challengeStreaks}
+              userId={user.id}
+              todayKst={todayKst}
             />
           </section>
         )}

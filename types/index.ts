@@ -75,6 +75,35 @@ export interface Streak {
   last_reflection_date: string | null;
 }
 
+export type ChallengeCategory = 'meditation' | 'study' | 'exercise' | 'prayer' | 'gratitude' | 'custom';
+export type ChallengeCadence = 'daily' | 'weekly';
+
+export interface Challenge {
+  id: string;
+  user_id: string;
+  name: string;
+  emoji: string | null;
+  category: ChallengeCategory;
+  cadence: ChallengeCadence;
+  target_value: number | null;
+  target_unit: string | null;
+  is_pinned: boolean;
+  started_at: string;
+  ended_at: string | null;
+  created_at: string;
+}
+
+export interface ChallengeLog {
+  id: string;
+  challenge_id: string;
+  user_id: string;
+  date: string;
+  value: number | null;
+  note: string | null;
+  reflection_id: string | null;
+  created_at: string;
+}
+
 export type IllustrationType = 'dawn' | 'night' | 'spring';
 
 export interface LectionaryReading {

@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
 import HomeClient from './HomeClient';
-import type { DailyReading, BibleVersion, ReadingTrack, LectionaryReading } from '@/types';
+import type { DailyReading, BibleVersion, ReadingTrack, LectionaryReading, Challenge, ChallengeLog } from '@/types';
 import { getTodayDateString } from '@/utils/date';
 import { extractKeyVerse, getContent } from '@/utils/bible';
+import { calculateStreak } from '@/lib/challenges';
 
 function getThisMonday(): string {
   const d = new Date();
@@ -63,6 +64,9 @@ export default async function HomePage() {
   let weeklyCount = 0;
   let userGroup: { id: string; name: string; todayCount: number } | null = null;
   let recentWords: { id: string; one_line_word: string; created_at: string }[] = [];
+  let challenges: Challenge[] = [];
+  let todayLogs: ChallengeLog[] = [];
+  let challengeStreaks: Record<string, number> = {};
 
   if (user) {
     const readingId = lectionaryReading?.id ?? reading?.id;
@@ -124,6 +128,41 @@ export default async function HomePage() {
       userGroup = { id: g.id, name: g.name, todayCount: countRes.count ?? 0 };
       hasCheckInToday = (checkRes.count ?? 0) > 0;
     }
+
+    // ── 챌린지 (함께 걷는 훈련) ──
+    const { data: chs } = await supabase
+      .from('challenges')
+      .select('*')
+      .eq('user_id', user.id)
+      .is('ended_at', null)
+      .eq('is_pinned', true)
+      .order('created_at', { ascending: true });
+    challenges = (chs ?? []) as Challenge[];
+
+    if (challenges.length > 0) {
+      const challengeIds = challenges.map(c => c.id);
+      // 최근 90일치 logs (streak 계산용)
+      const ninetyDaysAgo = new Date();
+      ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+      const since = ninetyDaysAgo.toISOString().split('T')[0];
+
+      const { data: allLogs } = await supabase
+        .from('challenge_logs')
+        .select('*')
+        .in('challenge_id', challengeIds)
+        .gte('date', since)
+        .order('date', { ascending: true });
+
+      const logs = (allLogs ?? []) as ChallengeLog[];
+      todayLogs = logs.filter(l => l.date === today);
+
+      // 각 challenge 별 streak 계산
+      for (const c of challenges) {
+        const cLogs = logs.filter(l => l.challenge_id === c.id);
+        const s = calculateStreak(cLogs, today);
+        challengeStreaks[c.id] = s.current;
+      }
+    }
   }
 
   const todayLabel = readingTrack === 'lectionary'
@@ -166,6 +205,10 @@ export default async function HomePage() {
       userGroup={userGroup}
       recentWords={recentWords}
       todayVerse={todayVerse}
+      challenges={challenges}
+      todayLogs={todayLogs}
+      challengeStreaks={challengeStreaks}
+      todayKst={today}
     />
   );
 }
