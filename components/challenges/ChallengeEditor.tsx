@@ -17,6 +17,7 @@ export default function ChallengeEditor({ userId, onCreated, onCancel }: Props) 
   const [category, setCategory] = useState<ChallengeCategory>('study');
   const [targetValue, setTargetValue] = useState('');
   const [targetUnit, setTargetUnit] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,6 +36,7 @@ export default function ChallengeEditor({ userId, onCreated, onCancel }: Props) 
       target_value: targetValue ? Number(targetValue) : null,
       target_unit: targetUnit.trim() || null,
       is_pinned: true,
+      is_public: isPublic,
     });
 
     setSaving(false);
@@ -103,6 +105,30 @@ export default function ChallengeEditor({ userId, onCreated, onCancel }: Props) 
           className="w-20 h-9 px-3 text-sm bg-muted/40 rounded-xl focus:outline-none focus:bg-muted/60 liquid-transition"
         />
       </div>
+
+      {/* 공개 여부 */}
+      <button
+        onClick={() => setIsPublic((v) => !v)}
+        className="w-full flex items-center justify-between gap-3 px-1 py-1.5 text-left"
+      >
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-foreground">다른 분들도 보게 공개</p>
+          <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+            같은 카테고리 사람들이 이 훈련을 영감으로 시작할 수 있어요
+          </p>
+        </div>
+        <span
+          className={`relative w-9 h-5 rounded-full liquid-transition-fast shrink-0 ${
+            isPublic ? 'bg-primary' : 'bg-muted'
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+              isPublic ? 'translate-x-4' : 'translate-x-0.5'
+            }`}
+          />
+        </span>
+      </button>
 
       {error && (
         <p className="text-[11px] text-orange-600 dark:text-orange-400">{error}</p>

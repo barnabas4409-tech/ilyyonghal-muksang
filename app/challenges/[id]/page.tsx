@@ -17,6 +17,11 @@ interface LinkedReflection {
   date: string;
 }
 
+interface OriginInfo {
+  display_name: string | null;
+  handle: string | null;
+}
+
 export default async function ChallengeDetailPage({ params }: PageProps) {
   const { id } = await params;
   const supabase = await createClient();
@@ -44,6 +49,34 @@ export default async function ChallengeDetailPage({ params }: PageProps) {
   const logs = (rawLogs ?? []) as ChallengeLog[];
   const todayKst = getTodayDateString();
   const streakInfo = calculateStreak(logs, todayKst);
+
+  // 공유 메타 (원본 정보 + 복사본 카운트)
+  let originInfo: OriginInfo | null = null;
+  let copiedCount = 0;
+
+  if (challenge.copied_from) {
+    const { data: origin } = await supabase
+      .from('challenges')
+      .select('user_id')
+      .eq('id', challenge.copied_from)
+      .single();
+    if (origin) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name, handle')
+        .eq('id', origin.user_id)
+        .single();
+      if (profile) originInfo = { display_name: profile.display_name, handle: profile.handle };
+    }
+  }
+
+  if (challenge.is_public) {
+    const { count } = await supabase
+      .from('challenges')
+      .select('id', { count: 'exact', head: true })
+      .eq('copied_from', id);
+    copiedCount = count ?? 0;
+  }
 
   // 연결된 reflections 정보 (manual join — daily_readings + lectionary_readings)
   const reflectionIds = Array.from(
@@ -93,6 +126,8 @@ export default async function ChallengeDetailPage({ params }: PageProps) {
       linkedReflections={linkedReflections}
       todayKst={todayKst}
       userId={user.id}
+      originInfo={originInfo}
+      copiedCount={copiedCount}
     />
   );
 }

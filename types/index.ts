@@ -88,6 +88,8 @@ export interface Challenge {
   target_value: number | null;
   target_unit: string | null;
   is_pinned: boolean;
+  is_public: boolean;
+  copied_from: string | null;
   started_at: string;
   ended_at: string | null;
   created_at: string;

@@ -16,6 +16,11 @@ interface LinkedReflection {
   date: string;
 }
 
+interface OriginInfo {
+  display_name: string | null;
+  handle: string | null;
+}
+
 interface Props {
   challenge: Challenge;
   logs: ChallengeLog[];
@@ -23,6 +28,8 @@ interface Props {
   linkedReflections: LinkedReflection[];
   todayKst: string;
   userId: string;
+  originInfo: OriginInfo | null;
+  copiedCount: number;
 }
 
 function fmtKoreanDate(iso: string): string {
@@ -82,6 +89,7 @@ function welcomeMessage(
 
 export default function ChallengeDetailClient({
   challenge, logs, streakInfo, linkedReflections, todayKst, userId,
+  originInfo, copiedCount,
 }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -95,6 +103,7 @@ export default function ChallengeDetailClient({
     challenge.target_value != null ? String(challenge.target_value) : '',
   );
   const [targetUnit, setTargetUnit] = useState(challenge.target_unit ?? '');
+  const [isPublic, setIsPublic] = useState(challenge.is_public);
   const [busy, setBusy] = useState(false);
 
   const doneToday = logs.some((l) => l.date === todayKst);
@@ -122,6 +131,7 @@ export default function ChallengeDetailClient({
         emoji: emoji.trim() || null,
         target_value: targetValue ? Number(targetValue) : null,
         target_unit: targetUnit.trim() || null,
+        is_public: isPublic,
       })
       .eq('id', challenge.id);
     setBusy(false);
@@ -250,6 +260,28 @@ export default function ChallengeDetailClient({
               className="w-20 h-9 px-3 text-sm bg-muted/40 rounded-xl focus:outline-none"
             />
           </div>
+          <button
+            onClick={() => setIsPublic((v) => !v)}
+            className="w-full flex items-center justify-between gap-3 px-1 py-1.5 text-left"
+          >
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-foreground">다른 분들도 보게 공개</p>
+              <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+                같은 카테고리에서 영감으로 시작할 수 있어요
+              </p>
+            </div>
+            <span
+              className={`relative w-9 h-5 rounded-full liquid-transition-fast shrink-0 ${
+                isPublic ? 'bg-primary' : 'bg-muted'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                  isPublic ? 'translate-x-4' : 'translate-x-0.5'
+                }`}
+              />
+            </span>
+          </button>
           <div className="flex gap-2">
             <button
               onClick={() => setEditing(false)}
@@ -265,6 +297,23 @@ export default function ChallengeDetailClient({
               {busy ? '저장 중...' : '저장'}
             </button>
           </div>
+        </section>
+      )}
+
+      {/* 공유 메타 — 원본 또는 함께 시작한 분들 */}
+      {(originInfo || copiedCount > 0) && (
+        <section className="text-center text-[11px] text-muted-foreground/80 leading-relaxed">
+          {originInfo && (
+            <p>
+              <span className="text-primary">{originInfo.display_name ?? '벗'}</span>
+              <span className="text-muted-foreground">님의 훈련에서 영감을 받았어요</span>
+            </p>
+          )}
+          {copiedCount > 0 && (
+            <p className="mt-1">
+              <span className="text-primary">{copiedCount}명</span>이 이 훈련을 함께 시작했어요 🌱
+            </p>
+          )}
         </section>
       )}
 

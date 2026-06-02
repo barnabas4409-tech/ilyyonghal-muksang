@@ -252,9 +252,17 @@ export default function HomeClient({
         {/* 함께 걷는 훈련 — 챌린지. 묵상은 위에 있음, 여기는 동반 훈련 */}
         {user && !user.is_anonymous && (
           <section className="pt-2 border-t border-border/40">
-            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-[0.18em] mb-4">
-              함께 걷는 훈련
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-[0.18em]">
+                함께 걷는 훈련
+              </p>
+              <Link
+                href="/challenges/explore"
+                className="text-xs text-primary font-medium"
+              >
+                탐색 →
+              </Link>
+            </div>
             <ChallengeList
               challenges={challenges}
               logs={todayLogs}
