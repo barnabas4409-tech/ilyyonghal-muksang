@@ -42,6 +42,13 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  // 닉네임
+  const [displayName, setDisplayName] = useState(profile?.display_name ?? '');
+  const [handle, setHandle] = useState(profile?.handle ?? '');
+  const [nickSaving, setNickSaving] = useState(false);
+  const [nickSaved, setNickSaved] = useState(false);
+  const [nickError, setNickError] = useState<string | null>(null);
+
   // 블록 조립 (초기값은 Phase 5 BlockFlowEditor가 normalizeBlocks로 처리)
   const initBlocks = (profile as { custom_blocks?: unknown })?.custom_blocks ?? null;
 
@@ -94,6 +101,31 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
     router.refresh();
   }
 
+  async function handleSaveNickname() {
+    if (!displayName.trim() || !handle.trim() || nickSaving) return;
+    setNickSaving(true);
+    setNickError(null);
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setNickSaving(false); return; }
+
+    const cleanHandle = handle.trim().toLowerCase().replace(/\s+/g, '_');
+    const { error } = await supabase
+      .from('profiles')
+      .update({ display_name: displayName.trim(), handle: cleanHandle, handle_changed_at: new Date().toISOString() })
+      .eq('id', user.id);
+
+    setNickSaving(false);
+    if (error) {
+      setNickError(error.code === '23505' ? '이미 사용 중인 아이디예요' : error.message);
+      return;
+    }
+    setHandle(cleanHandle);
+    setNickSaved(true);
+    setTimeout(() => setNickSaved(false), 2000);
+    router.refresh();
+  }
+
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
@@ -136,6 +168,48 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
         {profile?.created_at && (
           <p className="text-xs text-muted-foreground mt-1">{formatJoinDate(profile.created_at)} 시작</p>
         )}
+      </div>
+
+      {/* 닉네임 설정 */}
+      <div className="mx-5 card-float px-5 mb-4">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider pt-4 pb-3">닉네임</p>
+        <div className="space-y-2 pb-4">
+          <div className="flex gap-2">
+            <div className="flex-1 space-y-1.5">
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value.slice(0, 16))}
+                placeholder="표시 이름"
+                className="w-full h-10 px-3 text-sm bg-muted/40 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary/30"
+              />
+              <p className="text-[10px] text-muted-foreground/60 px-1">공개 시 표시되는 이름</p>
+            </div>
+            <div className="flex-1 space-y-1.5">
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">@</span>
+                <input
+                  type="text"
+                  value={handle}
+                  onChange={(e) => setHandle(e.target.value.slice(0, 20).replace(/[^a-z0-9_\-가-힣]/gi, ''))}
+                  placeholder="아이디"
+                  className="w-full h-10 pl-7 pr-3 text-sm bg-muted/40 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary/30"
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground/60 px-1">고유 식별자</p>
+            </div>
+          </div>
+          {nickError && (
+            <p className="text-[11px] text-orange-600 dark:text-orange-400">{nickError}</p>
+          )}
+          <button
+            onClick={handleSaveNickname}
+            disabled={!displayName.trim() || !handle.trim() || nickSaving}
+            className="w-full py-2.5 bg-primary/10 text-primary rounded-xl text-xs font-medium disabled:opacity-40 active:scale-[0.98] liquid-transition"
+          >
+            {nickSaving ? '저장 중...' : nickSaved ? '저장됨 ✓' : '닉네임 저장'}
+          </button>
+        </div>
       </div>
 
       {/* 통계 */}

@@ -43,6 +43,8 @@ export interface OneLineBlock {
   readingId: string;
   existingReflection: Reflection | null;
   userId: string | null;
+  displayName: string | null;
+  handle: string | null;
 }
 
 export interface PracticeBlock {

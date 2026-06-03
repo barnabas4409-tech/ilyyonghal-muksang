@@ -1,15 +1,22 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import type { OneLineBlock as Props } from '@/types/blocks';
 
-export default function OneLineBlock({ readingId, existingReflection, userId }: Props) {
+export default function OneLineBlock({ readingId, existingReflection, userId, displayName, handle }: Props) {
   const [value, setValue] = useState(existingReflection?.one_line_word ?? '');
   const [editing, setEditing] = useState(!existingReflection?.one_line_word);
   const [saved, setSaved] = useState<boolean>(!!existingReflection?.one_line_word);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [isShared, setIsShared] = useState(existingReflection?.is_public ?? false);
+  const [isAnonymousShare, setIsAnonymousShare] = useState(existingReflection?.is_anonymous ?? false);
+  const [showShareOptions, setShowShareOptions] = useState(false);
+  const [sharing, setSharing] = useState(false);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -45,6 +52,36 @@ export default function OneLineBlock({ readingId, existingReflection, userId }: 
     }
     setSaved(true);
     setEditing(false);
+  }
+
+  async function share(anonymous: boolean) {
+    if (!userId || sharing) return;
+    setSharing(true);
+    const supabase = createClient();
+    await supabase
+      .from('reflections')
+      .update({
+        is_public: true,
+        is_anonymous: anonymous,
+      })
+      .eq('user_id', userId)
+      .eq('reading_id', readingId);
+    setSharing(false);
+    setIsShared(true);
+    setIsAnonymousShare(anonymous);
+    setShowShareOptions(false);
+  }
+
+  async function unshare() {
+    if (!userId) return;
+    const supabase = createClient();
+    await supabase
+      .from('reflections')
+      .update({ is_public: false })
+      .eq('user_id', userId)
+      .eq('reading_id', readingId);
+    setIsShared(false);
+    setShowShareOptions(false);
   }
 
   return (
@@ -93,6 +130,93 @@ export default function OneLineBlock({ readingId, existingReflection, userId }: 
             <p className="text-[10px] text-orange-600 dark:text-orange-400 text-center px-2">
               저장 실패: {error}
             </p>
+          )}
+        </div>
+      )}
+
+      {/* 공유 섹션 — 저장 완료 후에만 표시 */}
+      {saved && userId && (
+        <div className="mt-8 border-t border-border/40 pt-6">
+          {!displayName ? (
+            /* 닉네임 미설정 */
+            <div className="text-center space-y-2">
+              <p className="text-xs text-muted-foreground">
+                닉네임을 설정하면 동행자들과 말씀을 나눌 수 있어요
+              </p>
+              <Link
+                href="/profile"
+                className="inline-block text-xs text-primary font-medium border border-primary/30 px-4 py-1.5 rounded-full liquid-transition"
+              >
+                닉네임 설정하기 →
+              </Link>
+            </div>
+          ) : isShared ? (
+            /* 이미 나눔 상태 */
+            <div className="text-center space-y-3">
+              <p className="text-[10px] text-primary uppercase tracking-[0.2em]">
+                {isAnonymousShare ? '익명으로' : `${displayName}으로`} 나누고 있어요
+              </p>
+              <div className="flex items-center justify-center gap-4">
+                <Link
+                  href="/companions"
+                  className="text-xs font-medium text-primary border border-primary/30 px-4 py-2 rounded-full liquid-transition"
+                >
+                  동행자 말씀 보기 →
+                </Link>
+                <button
+                  onClick={unshare}
+                  className="text-xs text-muted-foreground/60"
+                >
+                  나눔 취소
+                </button>
+              </div>
+            </div>
+          ) : showShareOptions ? (
+            /* 나눔 방법 선택 */
+            <div className="space-y-3">
+              <p className="text-[10px] text-center text-muted-foreground uppercase tracking-[0.18em]">
+                어떻게 나눌까요
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => share(false)}
+                  disabled={sharing}
+                  className="py-3 bg-primary/10 text-primary text-xs font-medium rounded-2xl disabled:opacity-40 liquid-transition active:scale-[0.98]"
+                >
+                  {displayName}으로
+                </button>
+                <button
+                  onClick={() => share(true)}
+                  disabled={sharing}
+                  className="py-3 bg-muted/60 text-foreground text-xs font-medium rounded-2xl disabled:opacity-40 liquid-transition active:scale-[0.98]"
+                >
+                  익명으로
+                </button>
+              </div>
+              <p className="text-[10px] text-muted-foreground/60 text-center leading-relaxed">
+                같은 말씀을 읽은 분들과 한 문장을 조용히 나눠요.<br />
+                댓글 없이 스티커로만 응답해요.
+              </p>
+              <button
+                onClick={() => setShowShareOptions(false)}
+                className="w-full text-xs text-muted-foreground/60 py-1"
+              >
+                취소
+              </button>
+            </div>
+          ) : (
+            /* 나눔 시작 유도 */
+            <div className="text-center space-y-2">
+              <button
+                onClick={() => setShowShareOptions(true)}
+                className="text-xs font-medium text-primary border border-primary/30 px-5 py-2 rounded-full liquid-transition active:scale-[0.98]"
+              >
+                동행자들과 나누기
+              </button>
+              <p className="text-[10px] text-muted-foreground/50">
+                같은 말씀을 읽은 분들의 한 문장도 볼 수 있어요
+              </p>
+            </div>
           )}
         </div>
       )}

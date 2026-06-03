@@ -15,6 +15,8 @@ interface JournalProps {
   userId: string | null;
   isAnonymous: boolean;
   groupId: string | null;
+  displayName: string | null;
+  handle: string | null;
 }
 
 function configToBlock(cfg: BlockConfig, p: JournalProps): MeditationBlock {
@@ -22,7 +24,7 @@ function configToBlock(cfg: BlockConfig, p: JournalProps): MeditationBlock {
     case 'quote':     return { type: 'quote' };
     case 'silence':   return { type: 'silence', defaultDuration: (cfg.mins ?? 5) * 60 };
     case 'journal':   return { type: 'journal', ...p };
-    case 'oneline':   return { type: 'oneline',   readingId: p.readingId, existingReflection: p.existingReflection, userId: p.userId };
+    case 'oneline':   return { type: 'oneline',   readingId: p.readingId, existingReflection: p.existingReflection, userId: p.userId, displayName: p.displayName, handle: p.handle };
     case 'prayer':    return { type: 'prayer',    readingId: p.readingId, existingReflection: p.existingReflection, userId: p.userId };
     case 'practice':  return { type: 'practice',  readingId: p.readingId, existingReflection: p.existingReflection, userId: p.userId };
     case 'gratitude': return { type: 'gratitude', readingId: p.readingId, existingReflection: p.existingReflection, userId: p.userId };
@@ -50,12 +52,14 @@ export default async function TodayPage() {
   let meditationMode: MeditationMode = 'standard';
   let groupId: string | null = null;
   let customBlocks: unknown = null;
+  let displayName: string | null = null;
+  let handle: string | null = null;
 
   if (user) {
     const [profileResult, groupResult] = await Promise.all([
       supabase
         .from('profiles')
-        .select('bible_version, reading_track, meditation_mode, custom_blocks')
+        .select('bible_version, reading_track, meditation_mode, custom_blocks, display_name, handle')
         .eq('id', user.id)
         .single(),
       supabase
@@ -70,6 +74,8 @@ export default async function TodayPage() {
     if (profileResult.data?.reading_track) readingTrack = profileResult.data.reading_track;
     if (profileResult.data?.meditation_mode) meditationMode = profileResult.data.meditation_mode;
     customBlocks = profileResult.data?.custom_blocks ?? null;
+    displayName = profileResult.data?.display_name ?? null;
+    handle = profileResult.data?.handle ?? null;
     if (groupResult.data?.group_id) groupId = groupResult.data.group_id;
   }
 
@@ -110,7 +116,7 @@ export default async function TodayPage() {
         <BlockRenderer blocks={buildBlocks(
           meditationMode,
           { type: 'scripture', lectionary, bibleVersion },
-          { readingId: lectionary.id, reflectionQuestion: lectionary.reflection_question, existingReflection, userId: user?.id ?? null, isAnonymous: isAnon, groupId },
+          { readingId: lectionary.id, reflectionQuestion: lectionary.reflection_question, existingReflection, userId: user?.id ?? null, isAnonymous: isAnon, groupId, displayName, handle },
           customBlocks,
         )} />
       </>
@@ -152,7 +158,7 @@ export default async function TodayPage() {
         <BlockRenderer blocks={buildBlocks(
           meditationMode,
           { type: 'dailyScripture', reading, bibleVersion },
-          { readingId: reading.id, reflectionQuestion: reading.reflection_question, existingReflection, userId: user?.id ?? null, isAnonymous: isAnon, groupId },
+          { readingId: reading.id, reflectionQuestion: reading.reflection_question, existingReflection, userId: user?.id ?? null, isAnonymous: isAnon, groupId, displayName, handle },
           customBlocks,
         )} />
       </>

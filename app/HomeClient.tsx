@@ -249,6 +249,26 @@ export default function HomeClient({
           </section>
         )}
 
+        {/* 오늘 함께 머문 말씀 — 묵상 완료 후에만 */}
+        {user && !user.is_anonymous && hasReflectionToday && (
+          <section className="pt-2 border-t border-border/40">
+            <Link
+              href="/companions"
+              className="flex items-center justify-between active:opacity-60 liquid-transition"
+            >
+              <div>
+                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-[0.18em]">
+                  오늘 함께 머문 말씀
+                </p>
+                <p className="text-sm text-foreground mt-1">
+                  같은 말씀을 읽은 동행자들의 한 문장
+                </p>
+              </div>
+              <span className="text-xs text-primary">→</span>
+            </Link>
+          </section>
+        )}
+
         {/* 함께 걷는 훈련 — 챌린지. 묵상은 위에 있음, 여기는 동반 훈련 */}
         {user && !user.is_anonymous && (
           <section className="pt-2 border-t border-border/40">

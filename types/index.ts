@@ -34,6 +34,9 @@ export interface Profile {
   bible_version: BibleVersion;
   reading_track: ReadingTrack;
   meditation_mode: MeditationMode;
+  display_name: string | null;
+  handle: string | null;
+  handle_changed_at: string | null;
 }
 
 export interface DailyReading {
@@ -58,6 +61,8 @@ export interface Reflection {
   content: string | null;
   highlighted_sentence: string | null;
   is_public: boolean;
+  is_anonymous: boolean;
+  is_hidden: boolean;
   created_at: string;
   updated_at: string;
   one_line_word: string | null;
@@ -66,6 +71,14 @@ export interface Reflection {
   extras?: { gratitude?: string; freenote?: string } | null;
   tags?: string[];
   daily_readings?: DailyReading;
+}
+
+export interface ReflectionReaction {
+  id: string;
+  reflection_id: string;
+  user_id: string;
+  sticker: 'pray' | 'sprout' | 'heart';
+  created_at: string;
 }
 
 export interface Streak {
