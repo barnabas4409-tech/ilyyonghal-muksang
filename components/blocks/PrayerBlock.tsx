@@ -11,7 +11,7 @@ export default function PrayerBlock({ readingId, existingReflection, userId }: P
   const [error, setError] = useState<string | null>(null);
 
   async function save() {
-    if (!userId || !value.trim() || saving) return;
+    if (!userId || value.trim().length < 3 || saving) return;
     setSaving(true);
     setError(null);
     const supabase = createClient();

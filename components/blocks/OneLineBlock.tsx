@@ -91,7 +91,10 @@ export default function OneLineBlock({ readingId, existingReflection, userId, di
         <p className="text-[10px] font-medium text-primary uppercase tracking-[0.2em] mb-1">
           한 줄 말씀
         </p>
-        <p className="text-xs text-muted-foreground">오늘 하나님이 내게 주신 한 문장</p>
+        <p className="text-xs text-muted-foreground">오늘 말씀에서 가장 마음에 남은 한 문장</p>
+        <p className="text-[10px] text-muted-foreground/50 mt-1 px-4 leading-relaxed">
+          성경 구절이어도 좋고, 내 언어로 풀어 써도 좋아요
+        </p>
       </div>
 
       {!editing && saved ? (
@@ -111,7 +114,7 @@ export default function OneLineBlock({ readingId, existingReflection, userId, di
             ref={textareaRef}
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            placeholder="한 문장으로 적어보세요"
+            placeholder="오늘 말씀 중 마음에 남은 한 문장..."
             maxLength={140}
             rows={1}
             className="w-full font-serif-kr text-2xl leading-relaxed text-foreground bg-transparent text-center placeholder:text-muted-foreground/30 focus:outline-none border-y border-primary/20 focus:border-primary/40 py-6 px-4 resize-none overflow-hidden liquid-transition"

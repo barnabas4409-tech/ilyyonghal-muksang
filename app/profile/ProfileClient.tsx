@@ -102,10 +102,12 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
   }
 
   async function handleSaveNickname() {
-    if (!displayName.trim() || !handle.trim() || nickSaving) return;
+    if (!displayName.trim() || nickSaving) return;
+    // handle이 없으면 display_name 기반으로 자동 생성
+    const rawHandle = handle.trim() || displayName.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_가-힣]/gi, '') + '_' + Math.random().toString(36).slice(2, 6);
 
     // 月 1회 handle 변경 제한
-    if (profile?.handle && profile.handle !== handle.trim() && profile.handle_changed_at) {
+    if (profile?.handle && profile.handle !== rawHandle && profile.handle_changed_at) {
       const lastChanged = new Date(profile.handle_changed_at);
       const daysSince = (Date.now() - lastChanged.getTime()) / (1000 * 60 * 60 * 24);
       if (daysSince < 30) {
@@ -121,7 +123,7 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setNickSaving(false); return; }
 
-    const cleanHandle = handle.trim().toLowerCase().replace(/\s+/g, '_');
+    const cleanHandle = rawHandle.toLowerCase().replace(/\s+/g, '_');
     const { error } = await supabase
       .from('profiles')
       .update({ display_name: displayName.trim(), handle: cleanHandle, handle_changed_at: new Date().toISOString() })
@@ -208,7 +210,7 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
                   className="w-full h-10 pl-7 pr-3 text-sm bg-muted/40 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary/30"
                 />
               </div>
-              <p className="text-[10px] text-muted-foreground/60 px-1">고유 식별자</p>
+              <p className="text-[10px] text-muted-foreground/60 px-1">비워두면 자동 설정돼요</p>
             </div>
           </div>
           {nickError && (
@@ -216,7 +218,7 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
           )}
           <button
             onClick={handleSaveNickname}
-            disabled={!displayName.trim() || !handle.trim() || nickSaving}
+            disabled={!displayName.trim() || nickSaving}
             className="w-full py-2.5 bg-primary/10 text-primary rounded-xl text-xs font-medium disabled:opacity-40 active:scale-[0.98] liquid-transition"
           >
             {nickSaving ? '저장 중...' : nickSaved ? '저장됨 ✓' : '닉네임 저장'}

@@ -8,7 +8,7 @@ const PRESETS = [
   { label: '10분', seconds: 600 },
 ];
 
-type State = 'idle' | 'running' | 'paused' | 'done';
+type State = 'idle' | 'running' | 'paused' | 'done' | 'skipped';
 
 export default function SilenceBlock({ defaultDuration = 300 }: { defaultDuration?: number }) {
   const [selected, setSelected] = useState(defaultDuration);
@@ -131,6 +131,19 @@ export default function SilenceBlock({ defaultDuration = 300 }: { defaultDuratio
     <div className="mx-5 bg-card border border-border rounded-2xl p-5">
       <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-[0.18em] mb-2">침묵</p>
 
+      {/* 건너뜀 상태 */}
+      {timerState === 'skipped' && (
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground/60">오늘은 넘어갔어요</p>
+          <button
+            onClick={() => setTimerState('idle')}
+            className="text-[11px] text-primary"
+          >
+            돌아오기
+          </button>
+        </div>
+      )}
+
       {/* 안내 문구 */}
       {timerState === 'idle' && (
         <p className="text-xs text-muted-foreground/70 leading-relaxed mb-4">
@@ -211,12 +224,20 @@ export default function SilenceBlock({ defaultDuration = 300 }: { defaultDuratio
 
       {/* 버튼 */}
       {timerState === 'idle' && (
-        <button
-          onClick={handleStart}
-          className="w-full py-3 bg-primary text-primary-foreground rounded-xl text-sm font-medium active:scale-[0.98] liquid-transition"
-        >
-          시작
-        </button>
+        <div className="space-y-2">
+          <button
+            onClick={handleStart}
+            className="w-full py-3 bg-primary text-primary-foreground rounded-xl text-sm font-medium active:scale-[0.98] liquid-transition"
+          >
+            시작
+          </button>
+          <button
+            onClick={() => setTimerState('skipped')}
+            className="w-full py-2 text-xs text-muted-foreground/50 liquid-transition-fast"
+          >
+            오늘은 건너뛸게요
+          </button>
+        </div>
       )}
 
       {timerState === 'running' && (

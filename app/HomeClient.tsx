@@ -121,7 +121,7 @@ function StreakStrip({ count, hasToday, hour }: { count: number; hasToday: boole
           {count}<span className="text-base font-medium text-muted-foreground ml-1">일</span>
         </p>
         <p className={`text-xs mt-1 ${isWarning ? 'text-orange-600 dark:text-orange-400 font-medium' : 'text-muted-foreground'}`}>
-          {isWarning ? '오늘 묵상해야 이어져요' : hasToday ? '연속 묵상 중' : '연속 묵상 중'}
+          {isWarning ? '오늘도 말씀 앞에 잠깐 머물러요' : '연속 묵상 중'}
         </p>
       </div>
     </div>
