@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import './globals.css';
 import BottomNav from '@/components/layout/BottomNav';
 import SideNav from '@/components/layout/SideNav';
 import AuthProvider from '@/components/layout/AuthProvider';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
+import PostHogProvider from '@/components/layout/PostHogProvider';
 
 export const metadata: Metadata = {
   title: '일용할묵상',
@@ -39,23 +41,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-dvh flex flex-col bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <AuthProvider>
-            <div className="flex min-h-dvh w-full">
-              {/* 데스크탑 사이드바 */}
-              <SideNav />
+          <Suspense>
+            <PostHogProvider>
+              <AuthProvider>
+                <div className="flex min-h-dvh w-full">
+                  {/* 데스크탑 사이드바 */}
+                  <SideNav />
 
-              {/* 콘텐츠 영역 */}
-              <div className="flex flex-col flex-1 min-w-0">
-                <main className="flex-1 pb-20 lg:pb-0">
-                  {/* 모바일: 꽉 채움 / 데스크탑: 중앙 최대 너비 */}
-                  <div className="w-full max-w-[430px] mx-auto lg:max-w-2xl">
-                    {children}
+                  {/* 콘텐츠 영역 */}
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <main className="flex-1 pb-20 lg:pb-0">
+                      {/* 모바일: 꽉 채움 / 데스크탑: 중앙 최대 너비 */}
+                      <div className="w-full max-w-[430px] mx-auto lg:max-w-2xl">
+                        {children}
+                      </div>
+                    </main>
+                    <BottomNav />
                   </div>
-                </main>
-                <BottomNav />
-              </div>
-            </div>
-          </AuthProvider>
+                </div>
+              </AuthProvider>
+            </PostHogProvider>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

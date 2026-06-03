@@ -5,6 +5,8 @@ export interface PatristicQuote {
   source: string;
   sourceOriginal: string;
   context: string;
+  bio?: string;
+  tradition?: string;
 }
 
 export const PATRISTIC_QUOTES: PatristicQuote[] = [
@@ -15,6 +17,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '로마인들에게 보내는 편지',
     sourceOriginal: 'Ad Romanos, IV.1',
     context: '순교를 앞두고 로마 교회에 보낸 편지에서, 자신의 죽음을 성찬 신학으로 해석한 문장. 빵이 곡식에서 빚어지듯 순교자는 고난을 통해 그리스도와 하나가 된다는 역설적 통찰.',
+    bio: '초대 교회 안티오키아의 세 번째 감독. 트라야누스 황제 치하에서 로마로 호송되던 중 순교했으며, 일곱 편의 서신이 오늘까지 전한다.',
+    tradition: '초대 교부',
   },
   {
     text: '씨앗으로서의 로고스는 모든 인간 안에 심겨 있다.',
@@ -23,6 +27,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '제2 호교론',
     sourceOriginal: 'Apologia Secunda, XIII.3',
     context: '로고스 스페르마티코스(logos spermatikos) 개념. 소크라테스와 플라톤도 로고스의 씨앗을 부분적으로 지녔다는 논증으로, 기독교와 철학의 관계를 정립한 초기 변증론의 핵심 명제.',
+    bio: '사마리아 출신의 철학자로 기독교로 개종한 후 로마에서 철학 학교를 열었다. 최초의 기독교 변증가 중 하나로, 165년경 마르쿠스 아우렐리우스 황제 시대에 순교했다.',
+    tradition: '초대 교부',
   },
   {
     text: '하나님의 영광은 완전히 살아있는 인간이며, 인간의 생명은 하나님을 바라보는 것이다.',
@@ -31,6 +37,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '이단 반박',
     sourceOriginal: 'Adversus Haereses, IV.20.7',
     context: '영지주의를 논박하며 창조의 선함을 옹호한 대목. "Gloria Dei vivens homo"로 알려진 이 명제는 물질 세계와 육체의 신학적 존엄성을 선언하며, 이레나이우스 신학의 핵심을 압축한다.',
+    bio: '소아시아 출신으로 폴리캅의 제자였으며, 갈리아(현 프랑스) 리용의 감독이 되었다. 영지주의를 체계적으로 반박하여 정통 신학의 기틀을 마련했다.',
+    tradition: '초대 교부',
   },
   {
     text: '그리스도인의 피는 씨앗이다.',
@@ -39,6 +47,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '호교론',
     sourceOriginal: 'Apologeticus, L.13',
     context: '박해자들에게 보내는 호교론의 결론부. 순교가 교회를 위축시키기는커녕 성장의 원동력이 된다는 역설을 한 문장으로 압축했다. "Sanguis martyrum semen Ecclesiae"라는 격언의 원형.',
+    bio: '카르타고 출신의 법학자이자 신학자. 라틴어 신학의 창시자로 불리며 삼위일체(Trinitas)라는 용어를 처음 사용했다. 후기에는 엄격주의 분파인 몬타누스파에 합류했다.',
+    tradition: '서방 교부',
   },
   {
     text: '철학은 그리스인들에게 주어진 언약이었다. 율법이 히브리인들에게 주어진 것처럼.',
@@ -47,6 +57,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '스트로마타',
     sourceOriginal: 'Stromata, I.5.28',
     context: '알렉산드리아 신학의 근본 전제. 이방 철학을 기독교 신앙의 예비 단계로 보는 이 명제는, 신앙과 이성의 종합을 추구한 알렉산드리아 학파 전체의 방향을 규정한다.',
+    bio: '알렉산드리아 교리문답학교의 학장으로, 그리스 철학과 기독교 신앙의 통합을 추구했다. 오리게네스의 스승으로 알렉산드리아 신학 전통의 아버지로 불린다.',
+    tradition: '알렉산드리아 학파',
   },
   {
     text: '성경 안에는 문자가 있고, 문자 뒤에는 도덕이 있으며, 도덕 위에는 영이 있다.',
@@ -55,6 +67,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '원리에 대하여',
     sourceOriginal: 'De Principiis, IV.2.4',
     context: '성경의 삼중 의미론을 체계화한 대목. 몸·혼·영이라는 인간 삼분법을 성경 해석에 적용하여, 문자 너머의 영적 의미를 탐구하는 알레고리 해석학의 신학적 근거를 제시한다.',
+    bio: '알렉산드리아 출신으로 고대 최대의 성경 주석가이자 신학자. 방대한 저술을 남겼으나 사후 일부 사상이 이단으로 정죄되었다. 삼위일체와 영혼 선재설 논쟁의 중심에 섰다.',
+    tradition: '알렉산드리아 학파',
   },
   {
     text: '교회를 어머니로 삼지 않는 자는 하나님을 아버지로 삼을 수 없다.',
@@ -63,6 +77,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '교회의 단일성',
     sourceOriginal: 'De Ecclesiae Unitate, VI',
     context: '분리주의자 노바티아누스파를 논박하며 교회 일치의 신학적 필연성을 선언한 문장. 교회론과 구원론을 연결하는 이 명제는 이후 서방 교회 전통에서 가장 자주 인용되는 교회론 명제 중 하나다.',
+    bio: '카르타고의 감독으로 교회 일치와 감독 권위를 신학적으로 정립했다. 258년 발레리아누스 황제의 박해 때 순교했다.',
+    tradition: '서방 교부',
   },
   {
     text: '하나님의 말씀이 사람이 되신 것은, 우리가 그 안에서 신화(神化)되도록 하시기 위함이다.',
@@ -71,6 +87,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '말씀의 성육신에 대하여',
     sourceOriginal: 'De Incarnatione, LIV.3',
     context: '테오시스(theosis, 신화) 교리의 가장 명료한 표현. 성육신의 목적을 인간의 신화로 규정한 이 명제는 동방 신학의 구원론적 핵심이며, 아리우스 논쟁에서 그리스도의 완전한 신성이 왜 필수적인지를 설명한다.',
+    bio: '"세계를 상대로 홀로 맞섰다(Athanasius contra mundum)"는 말로 유명하다. 아리우스 논쟁에서 그리스도의 완전한 신성을 끝까지 수호하여 니케아 신경의 수호자가 되었다.',
+    tradition: '동방 교부',
   },
   {
     text: '인간 영혼 안에는 창조될 때부터 하나님을 향한 사랑의 씨앗이 심겨 있다.',
@@ -79,6 +97,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '도덕 규칙',
     sourceOriginal: 'Regulae Morales, Regula II',
     context: '수도 공동체를 위한 규범집에서, 하나님 사랑이 외부로부터 강제된 의무가 아니라 본성 안에 심겨진 씨앗임을 밝힌 대목. 이는 은혜가 자연을 파괴하지 않고 완성한다는 신학적 인간학의 토대다.',
+    bio: '대 바실리우스로도 불리며, 카이사리아의 감독. 동방 수도원 운동의 아버지로 공동체적 수도생활의 규칙을 정립했다. 나지안주스의 그레고리우스, 니사의 그레고리우스와 함께 캅파도키아 교부를 이룬다.',
+    tradition: '동방 교부',
   },
   {
     text: '신학은 모든 이에게 열려 있지 않다. 그것은 삶으로 정화된 자들의 것이다.',
@@ -87,6 +107,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '신학 강론',
     sourceOriginal: 'Theologica Orationes, 27.3',
     context: '아리우스 논쟁으로 소란했던 콘스탄티노폴리스에서 행한 다섯 신학 강론의 첫 문장. 신학적 사유의 전제조건은 학식이 아니라 삶의 정화라는 선언으로, 지식과 거룩함의 통합을 요구한다.',
+    bio: '"신학자"라는 별호를 받은 캅파도키아 교부. 콘스탄티노폴리스 공의회(381)를 주재했으며, 성령의 완전한 신성을 신학적으로 정립했다.',
+    tradition: '동방 교부',
   },
   {
     text: '하나님을 향해 나아가는 것에는 끝이 없다. 선 자체가 본질적으로 무한하기 때문이다.',
@@ -95,6 +117,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '모세의 생애',
     sourceOriginal: 'Vita Moysis, II.239',
     context: '에펙타시스(epektasis) 개념의 핵심 진술. 하나님을 향한 여정은 도달점에서 끝나지 않고 영원히 더 깊이 들어가는 전진이라는 통찰. 빌립보서 3:13의 "앞에 있는 것을 향해 뻗어나감"을 신학적으로 전개한다.',
+    bio: '대 바실리우스의 동생으로 신비주의 신학과 영성 사상에 탁월했다. "어둠 속에서 하나님을 만난다"는 부정 신학(apophatic theology)을 발전시켰다.',
+    tradition: '동방 교부',
   },
   {
     text: '성경을 읽을 때 하나님이 우리에게 말씀하시고, 기도할 때 우리가 하나님께 말씀드린다.',
@@ -103,6 +127,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '성직의 의무',
     sourceOriginal: 'De Officiis Ministrorum, I.20.88',
     context: '성직자 교육을 위해 쓴 윤리 지침서에서, 성경 읽기와 기도의 상호성을 규정한 대목. 이 두 실천을 하나님과의 대화로 이해하는 틀은 이후 렉시오 디비나 전통의 신학적 기초가 된다.',
+    bio: '밀라노의 감독으로, 세례받기 전 세속 관료로서 탁월한 정치 경력을 가졌다. 아우구스티누스에게 세례를 베풀었으며 중세 서방 교회에 지대한 영향을 끼쳤다.',
+    tradition: '서방 교부',
   },
   {
     text: '그대가 하나님을 섬기고자 한다면, 가난한 자를 섬기는 것부터 시작하라.',
@@ -111,6 +137,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '마태복음 강해',
     sourceOriginal: 'In Matthaeum Homiliae, L.4',
     context: '마태복음 25장(최후 심판)을 강해하는 설교에서. 황금 제단을 치장하는 것보다 굶주린 그리스도를 먹이는 것이 우선이라는 도전적 선언으로, 전례와 사회 윤리를 통합하는 크리소스토무스 신학의 정수.',
+    bio: '"황금의 입"이라는 뜻의 크리소스토무스는 안티오키아 출신의 탁월한 설교자. 콘스탄티노폴리스 대주교가 되었으나 권력자들의 부패를 직언하다 두 차례 유배되어 그 도중 세상을 떠났다.',
+    tradition: '동방 교부',
   },
   {
     text: '성경을 모르는 것은 그리스도를 모르는 것이다.',
@@ -119,6 +147,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '이사야 주석 서문',
     sourceOriginal: 'Commentarii in Isaiam, Prologus',
     context: '이사야서 방대한 주석을 시작하며 성경 연구의 중요성을 선언한 서문. 라틴 성경 번역(불가타)에 생애를 바친 히에로니무스의 신념을 압축한다. 성경 주석학과 그리스도론이 분리될 수 없음을 선언.',
+    bio: '히브리어와 그리스어에 능통한 성경학자. 베들레헴에 수도원을 세우고 성경 전체를 라틴어로 번역한 불가타 성경을 완성했다. 이 번역본은 1,000년 이상 서방 교회의 공식 성경으로 사용되었다.',
+    tradition: '서방 교부',
   },
   {
     text: '우리의 마음은 주님 안에서 쉬기 전까지는 쉬지 못합니다.',
@@ -127,6 +157,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '고백록',
     sourceOriginal: 'Confessiones, I.1.1',
     context: '고백록 첫 문장. 하나님을 향한 피조물의 실존적 불안과 귀환 욕구를 압축한 기독교 영성 문학 최고의 명문. 인간의 영혼이 창조주 안에서만 진정한 안식을 찾는다는 아우구스티누스 신학의 출발점.',
+    bio: '서방 신학의 아버지. 방탕한 청년 시절을 거쳐 어머니 모니카의 기도와 암브로시우스의 영향으로 회심했다. 은혜론, 원죄론, 교회론에 걸쳐 중세 신학 전체의 토대를 놓았다.',
+    tradition: '서방 교부',
   },
   {
     text: '우리는 우리가 사랑하는 것으로 변해간다.',
@@ -135,6 +167,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '요한서신 강해',
     sourceOriginal: 'In Epistulam Ioannis ad Parthos, II.14',
     context: '사랑을 다루는 강해에서. 어떤 대상을 향해 의지와 욕망이 흐르느냐에 따라 인격이 형성된다는 아우구스티누스의 의지론적 인간학. 하나님을 사랑하는 것이 곧 하나님을 닮아가는 것이라는 윤리적 함의를 담는다.',
+    bio: '서방 신학의 아버지. 방탕한 청년 시절을 거쳐 어머니 모니카의 기도와 암브로시우스의 영향으로 회심했다. 은혜론, 원죄론, 교회론에 걸쳐 중세 신학 전체의 토대를 놓았다.',
+    tradition: '서방 교부',
   },
   {
     text: '그리스도인이여, 그대의 존엄성을 기억하라. 그대는 이제 하나님의 본성에 참여하게 되었다.',
@@ -143,6 +177,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '성탄 설교',
     sourceOriginal: 'Sermo in Nativitate Domini, I.3',
     context: '성탄 설교에서 성육신이 인간 존엄성을 근원적으로 회복시켰다는 선언. 세리스쿠스 목사가 아닌 대중에게 한 이 설교는, 그리스도의 탄생이 곧 새로운 인류의 탄생임을 선포한다.',
+    bio: '교황 레오 1세. 로마 교황의 권위를 신학적으로 확립하고, 칼케돈 공의회(451)에서 그리스도의 두 본성 교리를 정립하는 데 결정적 역할을 했다. 훈족 아틸라와 협상하여 로마를 구한 것으로도 유명하다.',
+    tradition: '서방 교부',
   },
   {
     text: '여기에 내가 서 있습니다. 하나님이여, 도와주소서. 나는 달리 할 수 없습니다.',
@@ -151,6 +187,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '보름스 의회 증언',
     sourceOriginal: 'Diet of Worms, 1521',
     context: '황제와 교황의 권위 앞에서 자신의 저작 철회를 거부하며 한 역사적 선언. 양심이 하나님의 말씀에 사로잡혀 있는 한 물러설 수 없다는 고백으로, 종교개혁의 분수령이 된 순간을 담는다.',
+    bio: '독일 아우구스티누스 수도사로, 1517년 95개조 반박문을 발표하여 종교개혁의 불꽃을 당겼다. 성경을 독일어로 번역하여 독일어 표준화에 기여하고, 오직 믿음·오직 은혜·오직 성경의 원리를 세웠다.',
+    tradition: '종교개혁',
   },
   {
     text: '율법은 우리를 그리스도에게로 몰아가며, 복음은 우리를 그리스도 안으로 이끈다.',
@@ -159,6 +197,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '갈라디아서 강해',
     sourceOriginal: 'In Epistulam ad Galatas Commentarius, 1535',
     context: '루터 신학의 핵심인 율법과 복음의 변증법을 압축한 명제. 율법은 죄를 드러내어 인간을 절망으로 이끌고, 복음은 그 자리에서 그리스도를 가리킨다는 구조는 루터 설교학 전체의 뼈대다.',
+    bio: '독일 아우구스티누스 수도사로, 1517년 95개조 반박문을 발표하여 종교개혁의 불꽃을 당겼다. 성경을 독일어로 번역하여 독일어 표준화에 기여하고, 오직 믿음·오직 은혜·오직 성경의 원리를 세웠다.',
+    tradition: '종교개혁',
   },
   {
     text: '그리스도를 아는 것은 그분의 은덕(beneficia)을 아는 것이다.',
@@ -167,6 +207,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '신학개요',
     sourceOriginal: 'Loci Communes, Praefatio, 1521',
     context: '종교개혁 최초의 조직신학 서문에서, 그리스도론의 중심을 사변이 아닌 구원론에 두겠다는 선언. 삼위일체의 본질보다 하나님이 우리를 위해 무엇을 하셨는가를 묻는 개신교 신학의 방향을 규정한다.',
+    bio: '루터의 동역자이자 개신교 최초의 조직신학자. 비텐베르크 대학에서 인문학과 신학을 가르치며 루터파 교육의 토대를 마련했다. 아우구스부르크 신앙고백서의 주요 작성자다.',
+    tradition: '종교개혁',
   },
   {
     text: '하나님의 말씀은 영원하고 확실하다. 그것은 어떠한 인간의 주장과도 타협하지 않는다.',
@@ -175,6 +217,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '67개 조항',
     sourceOriginal: '67 Conclusiones, I, 1523',
     context: '취리히 대논쟁을 위해 작성한 67개 조항의 첫 번째. 성경의 권위를 모든 개혁의 유일한 근거로 삼는다는 선언으로, 스위스 개혁교회가 로마와 루터파 양쪽과 구분되는 지점을 표시한다.',
+    bio: '스위스 취리히의 개혁자. 루터와 독자적으로 개혁 운동을 일으켰으며, 성찬론에서 루터와 입장 차이를 보였다. 1531년 스위스 내전에서 군종 목사로 참전하다 전사했다.',
+    tradition: '종교개혁',
   },
   {
     text: '하나님의 말씀이 없으면 인간의 모든 종교는 거짓 신들을 향한 방황이다.',
@@ -183,6 +227,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '기독교 강요',
     sourceOriginal: 'Institutio Christianae Religionis, I.6.3, 1559',
     context: '자연 계시의 한계를 논하는 대목. 타락 이후 인간의 인식 능력은 손상되었기에, 성경이 하나님을 바로 알기 위한 "안경"(spectacles)으로 필요하다는 칼뱅의 핵심 인식론.',
+    bio: '프랑스 출신으로 제네바에서 종교개혁을 이끌었다. 기독교 강요로 개혁교회 신학을 체계화했으며, 하나님 주권, 예정론, 교회 치리, 사회 변혁을 통합한 칼뱅주의 전통을 세웠다.',
+    tradition: '종교개혁',
   },
   {
     text: '하나님의 주권적 선택이 없다면, 우리 중 누가 구원에 이를 수 있겠는가.',
@@ -191,6 +237,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '기독교 강요',
     sourceOriginal: 'Institutio Christianae Religionis, III.21.1, 1559',
     context: '예정론을 다루는 장의 도입부. 이 교리를 오만한 사변이 아니라 구원의 확신과 하나님 찬양의 근거로 제시한다. 칼뱅에게 예정론은 공포가 아니라 위로의 교리다.',
+    bio: '프랑스 출신으로 제네바에서 종교개혁을 이끌었다. 기독교 강요로 개혁교회 신학을 체계화했으며, 하나님 주권, 예정론, 교회 치리, 사회 변혁을 통합한 칼뱅주의 전통을 세웠다.',
+    tradition: '종교개혁',
   },
   {
     text: '그리스도의 교회는 세상의 박해가 아니라 세상과의 타협으로 멸망한다.',
@@ -199,6 +247,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '스코틀랜드 종교개혁의 역사',
     sourceOriginal: 'The History of the Reformation in Scotland, 1559',
     context: '가톨릭 세력과 타협을 요구받던 스코틀랜드 개혁교회를 향한 권면. 순교는 이길 수 없지만 세속화는 교회를 안으로 무너뜨린다는 예언자적 경고.',
+    bio: '스코틀랜드 종교개혁의 아버지. 칼뱅에게 배운 후 귀국하여 스코틀랜드 장로교 교회를 세웠다. 권력자들 앞에서도 예언자적 직언을 멈추지 않은 것으로 유명하다.',
+    tradition: '종교개혁',
   },
   {
     text: '복음은 단순히 말로 선포될 뿐 아니라 성례전을 통해 가시적으로 선포된다.',
@@ -207,6 +257,8 @@ export const PATRISTIC_QUOTES: PatristicQuote[] = [
     source: '교회의 참된 치유에 대하여',
     sourceOriginal: 'Von der wahren Seelsorge, 1538',
     context: '목회 신학의 고전으로 꼽히는 이 저작에서 선포와 성례전의 통일성을 논한 대목. 목회를 설교와 성례전, 공동체적 돌봄의 통합으로 이해하는 부처 목회 신학의 핵심 명제.',
+    bio: '스트라스부르의 개혁자로 루터와 칼뱅을 잇는 교량 역할을 했다. 성찬 논쟁에서 중재를 시도했으며, 목회 신학과 예배 개혁에 탁월한 공헌을 남겼다.',
+    tradition: '종교개혁',
   },
 ];
 

@@ -1,6 +1,7 @@
 export type BibleVersion = 'gaeyeok' | 'gongdong' | 'catholic';
 export type ReadingTrack = 'curated' | 'lectionary' | 'chronological';
 export type MeditationMode = 'simple' | 'standard' | 'deep';
+export type FontSize = 'small' | 'medium' | 'large';
 
 export const BIBLE_VERSION_LABELS: Record<BibleVersion, string> = {
   gaeyeok: '개역개정',

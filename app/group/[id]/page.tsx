@@ -56,14 +56,46 @@ export default async function GroupFeedPage({ params }: PageProps) {
 
   // 사용자 이름 조회
   const userIds = [...new Set((rawChecks ?? []).map(c => c.user_id))];
+
+  // 전체 멤버 목록 (리더 현황용)
+  const { data: allMembers } = await supabase
+    .from('group_members')
+    .select('user_id, role')
+    .eq('group_id', id);
+
+  const allMemberIds = (allMembers ?? []).map(m => m.user_id);
+  const allProfileIds = [...new Set([...userIds, ...allMemberIds])];
+
   let nameMap: Record<string, string | null> = {};
-  if (userIds.length > 0) {
+  if (allProfileIds.length > 0) {
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, name')
-      .in('id', userIds);
-    for (const p of profiles ?? []) nameMap[p.id] = p.name;
+      .select('id, name, display_name')
+      .in('id', allProfileIds);
+    for (const p of profiles ?? []) nameMap[p.id] = p.display_name ?? p.name;
   }
+
+  // 오늘 묵상 완료 멤버 (reflection with content 기준)
+  let memberReflectionSet = new Set<string>();
+  if (allMemberIds.length > 0) {
+    const todayStart = `${today}T00:00:00+09:00`;
+    const todayEnd = `${today}T23:59:59+09:00`;
+    const { data: todayReflections } = await supabase
+      .from('reflections')
+      .select('user_id')
+      .in('user_id', allMemberIds)
+      .gte('updated_at', todayStart)
+      .lte('updated_at', todayEnd)
+      .not('content', 'is', null);
+    for (const r of todayReflections ?? []) memberReflectionSet.add(r.user_id);
+  }
+
+  const memberStatus = (allMembers ?? []).map(m => ({
+    user_id: m.user_id,
+    role: m.role,
+    name: nameMap[m.user_id] ?? null,
+    doneToday: memberReflectionSet.has(m.user_id),
+  }));
 
   const checks = (rawChecks ?? []).map(c => ({
     id: c.id,
@@ -83,6 +115,7 @@ export default async function GroupFeedPage({ params }: PageProps) {
       isLeader={isLeader}
       posts={posts ?? []}
       checks={checks}
+      memberStatus={memberStatus}
     />
   );
 }

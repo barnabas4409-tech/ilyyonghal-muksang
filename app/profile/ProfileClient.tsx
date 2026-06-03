@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import type { Profile, Streak, BibleVersion, ReadingTrack, MeditationMode } from '@/types';
+import type { Profile, Streak, BibleVersion, ReadingTrack, MeditationMode, FontSize } from '@/types';
 import { BIBLE_VERSION_LABELS, READING_TRACK_LABELS, MEDITATION_MODE_LABELS } from '@/types';
 import SettingRow from '@/components/ui/SettingRow';
 import BlockFlowEditor from '@/components/profile/BlockFlowEditor';
@@ -39,6 +39,7 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
   const [bibleVersion, setBibleVersion] = useState<BibleVersion>(profile?.bible_version ?? 'gaeyeok');
   const [readingTrack, setReadingTrack] = useState<ReadingTrack>(profile?.reading_track ?? 'lectionary');
   const [meditationMode, setMeditationMode] = useState<MeditationMode>(profile?.meditation_mode ?? 'standard');
+  const [fontSize, setFontSize] = useState<FontSize>(((profile as any)?.font_size as FontSize) ?? 'medium');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -92,8 +93,10 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
 
     await supabase
       .from('profiles')
-      .upsert({ id: user.id, bible_version: bibleVersion, reading_track: readingTrack, meditation_mode: meditationMode })
+      .upsert({ id: user.id, bible_version: bibleVersion, reading_track: readingTrack, meditation_mode: meditationMode, font_size: fontSize })
       .eq('id', user.id);
+
+    document.documentElement.setAttribute('data-font-size', fontSize);
 
     setSaving(false);
     setSaved(true);
@@ -240,7 +243,7 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
       {/* 화면 설정 */}
       <div className="mx-5 card-float px-5 mb-4">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider pt-4 pb-3">화면</p>
-        <div className="flex bg-muted/50 rounded-2xl p-1 gap-1 mb-4">
+        <div className="flex bg-muted/50 rounded-2xl p-1 gap-1 mb-3">
           {(['light', 'dark', 'system'] as ThemeOption[]).map(t => (
             <button
               key={t}
@@ -250,6 +253,20 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
               }`}
             >
               {THEME_LABELS[t]}
+            </button>
+          ))}
+        </div>
+        <p className="text-[10px] text-muted-foreground/70 mb-2 px-0.5">글자 크기</p>
+        <div className="flex bg-muted/50 rounded-2xl p-1 gap-1 mb-4">
+          {([['small', '작게'], ['medium', '기본'], ['large', '크게']] as [FontSize, string][]).map(([size, label]) => (
+            <button
+              key={size}
+              onClick={() => setFontSize(size)}
+              className={`flex-1 py-2 text-xs font-medium rounded-xl liquid-transition-fast ${
+                fontSize === size ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground'
+              }`}
+            >
+              {label}
             </button>
           ))}
         </div>

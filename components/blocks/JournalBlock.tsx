@@ -164,7 +164,7 @@ export default function JournalBlock({ readingId, reflectionQuestion, existingRe
 
       {/* 저장 후: 소그룹 인증 or 참여 유도 */}
       {reflectionId && (
-        <div className="px-5 pb-6">
+        <div className="px-5 pb-2">
           {groupId && userId ? (
             <CheckInSheet groupId={groupId} userId={userId} date={getTodayDateString()} />
           ) : userId && !isAnonymous ? (
@@ -178,6 +178,33 @@ export default function JournalBlock({ readingId, reflectionQuestion, existingRe
               </Link>
             </div>
           ) : null}
+        </div>
+      )}
+
+      {/* 묵상 완료 카드 */}
+      {reflectionId && (
+        <div className="mx-5 mb-10 mt-6 p-6 rounded-3xl border border-primary/20 bg-primary/5 text-center space-y-4">
+          <p className="text-3xl">🙏</p>
+          <div className="space-y-1">
+            <p className="text-base font-medium text-foreground">오늘의 묵상을 마쳤어요</p>
+            <p className="text-xs text-muted-foreground">말씀 앞에 충실히 머물렀어요</p>
+          </div>
+          <div className="flex gap-2 justify-center pt-1">
+            {!isAnonymous && (
+              <Link
+                href="/companions"
+                className="text-xs text-primary border border-primary/30 px-4 py-2 rounded-full liquid-transition active:scale-[0.98]"
+              >
+                동행자 말씀 보기
+              </Link>
+            )}
+            <Link
+              href="/"
+              className="text-xs font-medium btn-gold px-5 py-2 rounded-full liquid-transition active:scale-[0.98]"
+            >
+              홈으로 →
+            </Link>
+          </div>
         </div>
       )}
     </div>

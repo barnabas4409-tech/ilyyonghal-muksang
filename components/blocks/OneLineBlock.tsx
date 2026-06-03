@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import type { OneLineBlock as Props } from '@/types/blocks';
 import { josaRo } from '@/utils/korean';
+import { generateShareImage } from '@/utils/shareImage';
 
 export default function OneLineBlock({ readingId, existingReflection, userId, displayName, handle }: Props) {
   const [value, setValue] = useState(existingReflection?.one_line_word ?? '');
@@ -17,6 +18,7 @@ export default function OneLineBlock({ readingId, existingReflection, userId, di
   const [isAnonymousShare, setIsAnonymousShare] = useState(existingReflection?.is_anonymous ?? false);
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [generatingImage, setGeneratingImage] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -85,6 +87,30 @@ export default function OneLineBlock({ readingId, existingReflection, userId, di
     setShowShareOptions(false);
   }
 
+  async function handleShareImage() {
+    if (generatingImage || !value.trim()) return;
+    setGeneratingImage(true);
+    try {
+      const blob = await generateShareImage({ text: value.trim(), displayName });
+      if (!blob) return;
+      const file = new File([blob], '말씀카드.png', { type: 'image/png' });
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: '오늘의 한 줄 말씀' });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '말씀카드.png';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      if (!(err instanceof Error && err.name === 'AbortError')) console.error(err);
+    } finally {
+      setGeneratingImage(false);
+    }
+  }
+
   return (
     <div className="px-5 py-10">
       <div className="text-center mb-6">
@@ -98,16 +124,25 @@ export default function OneLineBlock({ readingId, existingReflection, userId, di
       </div>
 
       {!editing && saved ? (
-        <button
-          onClick={() => setEditing(true)}
-          className="w-full text-center group"
-          aria-label="한 줄 말씀 편집"
-        >
-          <p className="font-serif-kr text-2xl leading-relaxed text-foreground px-4 py-6 border-y border-primary/20 group-hover:border-primary/40 liquid-transition">
-            &ldquo;{value}&rdquo;
-          </p>
-          <p className="text-[10px] text-muted-foreground/60 mt-2">탭하여 수정</p>
-        </button>
+        <div className="w-full text-center">
+          <button
+            onClick={() => setEditing(true)}
+            className="w-full text-center group"
+            aria-label="한 줄 말씀 편집"
+          >
+            <p className="font-serif-kr text-2xl leading-relaxed text-foreground px-4 py-6 border-y border-primary/20 group-hover:border-primary/40 liquid-transition">
+              &ldquo;{value}&rdquo;
+            </p>
+            <p className="text-[10px] text-muted-foreground/60 mt-2">탭하여 수정</p>
+          </button>
+          <button
+            onClick={handleShareImage}
+            disabled={generatingImage}
+            className="mt-3 text-[11px] text-primary/60 border border-primary/20 px-4 py-1.5 rounded-full liquid-transition disabled:opacity-40"
+          >
+            {generatingImage ? '이미지 생성 중...' : '카드로 저장하기'}
+          </button>
+        </div>
       ) : (
         <div className="space-y-3">
           <textarea

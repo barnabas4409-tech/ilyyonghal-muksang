@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import HomeClient from './HomeClient';
 import type { DailyReading, BibleVersion, ReadingTrack, LectionaryReading, Challenge, ChallengeLog } from '@/types';
 import { getTodayDateString } from '@/utils/date';
@@ -25,12 +26,17 @@ export default async function HomePage() {
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('bible_version, reading_track, name')
+      .select('bible_version, reading_track, name, onboarded_at')
       .eq('id', user.id)
       .single();
     if (profile?.bible_version) bibleVersion = profile.bible_version;
     if (profile?.reading_track) readingTrack = profile.reading_track;
     if (profile?.name) userName = profile.name;
+
+    // 온보딩 미완료 시 리다이렉트 (익명 유저 제외)
+    if (!user.is_anonymous && profile && !profile.onboarded_at) {
+      redirect('/onboarding');
+    }
   }
 
   let reading: DailyReading | null = null;

@@ -25,6 +25,13 @@ interface Check {
   reactions: Reaction[];
 }
 
+interface MemberStatus {
+  user_id: string;
+  role: string;
+  name: string | null;
+  doneToday: boolean;
+}
+
 interface Props {
   groupId: string;
   groupName: string;
@@ -33,6 +40,7 @@ interface Props {
   isLeader: boolean;
   posts: Post[];
   checks: Check[];
+  memberStatus: MemberStatus[];
 }
 
 const STICKERS = [
@@ -109,7 +117,7 @@ function CheckCard({ check, userId }: { check: Check; userId: string }) {
   );
 }
 
-export default function GroupFeedClient({ groupId, groupName, inviteCode, userId, isLeader, posts: initialPosts, checks }: Props) {
+export default function GroupFeedClient({ groupId, groupName, inviteCode, userId, isLeader, posts: initialPosts, checks, memberStatus }: Props) {
   const [copied, setCopied] = useState(false);
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [showPostForm, setShowPostForm] = useState(false);
@@ -185,6 +193,33 @@ export default function GroupFeedClient({ groupId, groupName, inviteCode, userId
           >
             {posting ? '올리는 중...' : '올리기'}
           </button>
+        </div>
+      )}
+
+      {/* 리더 현황 — 오늘 묵상 완료 여부 */}
+      {isLeader && memberStatus.length > 0 && (
+        <div className="px-5 mb-5 space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">오늘의 현황</p>
+            <p className="text-[10px] text-muted-foreground/60">
+              {memberStatus.filter(m => m.doneToday).length}/{memberStatus.length}명 완료
+            </p>
+          </div>
+          <div className="card-float p-3 space-y-1">
+            {memberStatus.map(m => (
+              <div key={m.user_id} className="flex items-center gap-3 py-1.5">
+                <span className={`text-sm ${m.doneToday ? 'text-primary' : 'text-muted-foreground/30'}`}>
+                  {m.doneToday ? '✓' : '○'}
+                </span>
+                <span className={`text-sm flex-1 ${m.doneToday ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  {m.name ?? '이름 없음'}
+                </span>
+                {m.role === 'leader' && (
+                  <span className="text-[10px] text-primary/60 bg-primary/10 px-1.5 py-0.5 rounded-full">리더</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
