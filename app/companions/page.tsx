@@ -72,7 +72,7 @@ export default async function CompanionsPage() {
   if (hasMyReflection && readingId) {
     const { data: reflections } = await supabase
       .from('reflections')
-      .select('id, one_line_word, is_anonymous, user_id, created_at, profiles!inner(display_name, handle)')
+      .select('id, one_line_word, is_anonymous, user_id, created_at')
       .eq('reading_id', readingId)
       .eq('is_public', true)
       .eq('is_hidden', false)
@@ -81,16 +81,31 @@ export default async function CompanionsPage() {
       .order('created_at', { ascending: false })
       .limit(40);
 
-    if (reflections) {
-      sharedEntries = reflections.map((r: any) => ({
-        id: r.id,
-        one_line_word: r.one_line_word,
-        is_anonymous: r.is_anonymous,
-        user_id: r.user_id,
-        created_at: r.created_at,
-        display_name: r.is_anonymous ? null : (r.profiles?.display_name ?? null),
-        handle: r.is_anonymous ? null : (r.profiles?.handle ?? null),
-      }));
+    if (reflections && reflections.length > 0) {
+      // profiles는 별도 쿼리 (reflections → auth.users FK라 direct join 불가)
+      const userIds = reflections.filter((r) => !r.is_anonymous).map((r) => r.user_id);
+      const profileMap = new Map<string, { display_name: string | null; handle: string | null }>();
+
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, display_name, handle')
+          .in('id', userIds);
+        (profiles ?? []).forEach((p: any) => profileMap.set(p.id, p));
+      }
+
+      sharedEntries = reflections.map((r) => {
+        const prof = r.is_anonymous ? null : (profileMap.get(r.user_id) ?? null);
+        return {
+          id: r.id,
+          one_line_word: r.one_line_word,
+          is_anonymous: r.is_anonymous,
+          user_id: r.user_id,
+          created_at: r.created_at,
+          display_name: prof?.display_name ?? null,
+          handle: prof?.handle ?? null,
+        };
+      });
     }
 
     // 내 스티커 반응

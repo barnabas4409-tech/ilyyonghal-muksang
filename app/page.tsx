@@ -87,6 +87,7 @@ export default async function HomePage() {
             .select('id', { count: 'exact', head: true })
             .eq('user_id', user.id)
             .eq('reading_id', readingId)
+            .not('one_line_word', 'is', null)
         : Promise.resolve({ count: 0, error: null }),
       supabase
         .from('reflections')

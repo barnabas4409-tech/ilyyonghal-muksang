@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import type { OneLineBlock as Props } from '@/types/blocks';
+import { josaRo } from '@/utils/korean';
 
 export default function OneLineBlock({ readingId, existingReflection, userId, displayName, handle }: Props) {
   const [value, setValue] = useState(existingReflection?.one_line_word ?? '');
@@ -154,7 +155,7 @@ export default function OneLineBlock({ readingId, existingReflection, userId, di
             /* 이미 나눔 상태 */
             <div className="text-center space-y-3">
               <p className="text-[10px] text-primary uppercase tracking-[0.2em]">
-                {isAnonymousShare ? '익명으로' : `${displayName}으로`} 나누고 있어요
+                {isAnonymousShare ? '익명으로' : `${displayName}${josaRo(displayName!)}`} 나누고 있어요
               </p>
               <div className="flex items-center justify-center gap-4">
                 <Link
@@ -183,7 +184,7 @@ export default function OneLineBlock({ readingId, existingReflection, userId, di
                   disabled={sharing}
                   className="py-3 bg-primary/10 text-primary text-xs font-medium rounded-2xl disabled:opacity-40 liquid-transition active:scale-[0.98]"
                 >
-                  {displayName}으로
+                  {displayName}{josaRo(displayName!)}
                 </button>
                 <button
                   onClick={() => share(true)}

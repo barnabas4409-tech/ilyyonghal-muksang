@@ -103,6 +103,18 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
 
   async function handleSaveNickname() {
     if (!displayName.trim() || !handle.trim() || nickSaving) return;
+
+    // 月 1회 handle 변경 제한
+    if (profile?.handle && profile.handle !== handle.trim() && profile.handle_changed_at) {
+      const lastChanged = new Date(profile.handle_changed_at);
+      const daysSince = (Date.now() - lastChanged.getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSince < 30) {
+        const daysLeft = Math.ceil(30 - daysSince);
+        setNickError(`아이디는 한 달에 한 번 변경할 수 있어요. ${daysLeft}일 후에 다시 시도해주세요.`);
+        return;
+      }
+    }
+
     setNickSaving(true);
     setNickError(null);
     const supabase = createClient();
