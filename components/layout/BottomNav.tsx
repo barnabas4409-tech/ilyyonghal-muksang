@@ -53,6 +53,18 @@ const navItems = [
     ),
   },
   {
+    href: '/challenges',
+    label: '훈련',
+    icon: (active: boolean) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6"
+          fill={active ? 'currentColor' : 'none'} fillOpacity={active ? '0.1' : '0'} />
+        <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.6" />
+        <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
     href: '/discover',
     label: '발견',
     icon: (active: boolean) => (
@@ -88,7 +100,10 @@ export default function BottomNav() {
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border pb-safe">
       <div className="max-w-[430px] mx-auto flex items-center justify-around px-4 py-2">
         {navItems.map(({ href, label, icon }) => {
-          const active = pathname === href || (href === '/' && pathname.startsWith('/group'));
+          const active =
+            pathname === href ||
+            (href === '/' && pathname.startsWith('/group')) ||
+            (href === '/challenges' && pathname.startsWith('/challenges'));
           return (
             <Link
               key={href}
