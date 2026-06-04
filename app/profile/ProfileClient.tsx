@@ -9,9 +9,37 @@ import { BIBLE_VERSION_LABELS, READING_TRACK_LABELS, MEDITATION_MODE_LABELS } fr
 import SettingRow from '@/components/ui/SettingRow';
 import BlockFlowEditor from '@/components/profile/BlockFlowEditor';
 import { subscribePush, unsubscribePush, isPushSubscribed } from '@/utils/push';
+import Link from 'next/link';
 
 type ThemeOption = 'light' | 'dark' | 'system';
 const THEME_LABELS: Record<ThemeOption, string> = { light: '라이트', dark: '다크', system: '시스템' };
+
+function ReferralCopyButton({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+  async function copy() {
+    const text = `일용할묵상 초대 코드: ${code}\nhttps://ilyyonghal-muksang.vercel.app`;
+    if (navigator.share) {
+      await navigator.share({ title: '일용할묵상', text });
+    } else {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }
+  return (
+    <div className="flex items-center gap-3">
+      <p className="font-mono text-xl font-bold text-primary tracking-widest flex-1 text-center py-3 bg-primary/5 rounded-xl">
+        {code}
+      </p>
+      <button
+        onClick={copy}
+        className="text-xs text-primary font-medium border border-primary/30 px-4 py-3 rounded-xl liquid-transition"
+      >
+        {copied ? '복사됨 ✓' : '공유하기'}
+      </button>
+    </div>
+  );
+}
 
 const PUSH_TIME_OPTIONS = [
   '06:00', '07:00', '08:00', '09:00',
@@ -230,7 +258,7 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
       </div>
 
       {/* 통계 */}
-      <div className="mx-5 grid grid-cols-3 gap-2 mb-6">
+      <div className="mx-5 grid grid-cols-3 gap-2 mb-3">
         {stats.map(({ label, value, unit }) => (
           <div key={label} className="card-float p-4 text-center">
             <p className="text-2xl font-bold text-primary">{value}</p>
@@ -239,6 +267,9 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
           </div>
         ))}
       </div>
+      <Link href="/report" className="mx-5 mb-6 flex items-center justify-center gap-1 text-xs text-primary/70 font-medium liquid-transition">
+        형성 리포트 보기 →
+      </Link>
 
       {/* 화면 설정 */}
       <div className="mx-5 card-float px-5 mb-4">
@@ -395,13 +426,23 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
               {profile?.subscription_tier === 'premium' ? '프리미엄' : '무료 플랜'}
             </p>
           </div>
-          {profile?.subscription_tier !== 'premium' && (
-            <button className="text-xs text-primary font-medium border border-primary/30 px-3 py-1.5 rounded-full liquid-transition">
-              업그레이드
-            </button>
-          )}
+          <Link href="/billing" className="text-xs text-primary font-medium border border-primary/30 px-3 py-1.5 rounded-full liquid-transition">
+            {profile?.subscription_tier === 'premium' ? '관리' : '업그레이드'}
+          </Link>
         </div>
       </div>
+
+      {/* 레퍼럴 */}
+      {(profile as any)?.referral_code && (
+        <div className="mx-5 card-float p-5 mb-4">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">함께 시작하기</p>
+          <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+            교역자님이나 지인에게 일용할묵상을 소개해보세요.<br />
+            아래 코드를 공유하면 첫 묵상부터 함께할 수 있어요.
+          </p>
+          <ReferralCopyButton code={(profile as any).referral_code} />
+        </div>
+      )}
 
       {/* 로그아웃 */}
       <div className="mx-5 mb-4">
