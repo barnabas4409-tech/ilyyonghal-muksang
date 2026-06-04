@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import type { Challenge, ChallengeLog } from '@/types';
 import { CATEGORY_META, streakMessage } from '@/lib/challenges';
+import posthog from 'posthog-js';
 
 interface Props {
   challenge: Challenge;
@@ -49,7 +50,14 @@ export default function ChallengeCard({
           date: todayKst,
           value: challenge.target_value,
         });
-      if (err) setError(err.message);
+      if (!err) {
+        posthog.capture('challenge_check_in', {
+          category: challenge.category,
+          streak: currentStreak,
+        });
+      } else {
+        setError(err.message);
+      }
     }
 
     setBusy(false);

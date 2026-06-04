@@ -10,6 +10,7 @@ import SettingRow from '@/components/ui/SettingRow';
 import BlockFlowEditor from '@/components/profile/BlockFlowEditor';
 import { subscribePush, unsubscribePush, isPushSubscribed } from '@/utils/push';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 
 type ThemeOption = 'light' | 'dark' | 'system';
 const THEME_LABELS: Record<ThemeOption, string> = { light: '라이트', dark: '다크', system: '시스템' };
@@ -20,8 +21,10 @@ function ReferralCopyButton({ code }: { code: string }) {
     const text = `일용할묵상 초대 코드: ${code}\nhttps://ilyyonghal-muksang.vercel.app`;
     if (navigator.share) {
       await navigator.share({ title: '일용할묵상', text });
+      posthog.capture('referral_shared', { method: 'native' });
     } else {
       await navigator.clipboard.writeText(text);
+      posthog.capture('referral_shared', { method: 'clipboard' });
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
@@ -126,6 +129,12 @@ export default function ProfileClient({ profile, streak, totalReflections }: Pro
 
     document.documentElement.setAttribute('data-font-size', fontSize);
 
+    posthog.capture('settings_saved', {
+      bible_version: bibleVersion,
+      reading_track: readingTrack,
+      meditation_mode: meditationMode,
+      font_size: fontSize,
+    });
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);

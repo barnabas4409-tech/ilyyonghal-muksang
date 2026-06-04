@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import type { ReflectionReaction } from '@/types';
+import posthog from 'posthog-js';
 
 interface SharedEntry {
   id: string;
@@ -74,6 +75,7 @@ export default function CompanionsClient({ hasMyReflection, sharedEntries, myRea
       await supabase
         .from('reflection_reactions')
         .upsert({ reflection_id: reflectionId, user_id: userId, sticker }, { onConflict: 'reflection_id,user_id' });
+      posthog.capture('companion_reaction_sent', { sticker });
       setReactions((prev) => ({ ...prev, [reflectionId]: sticker }));
     }
   }

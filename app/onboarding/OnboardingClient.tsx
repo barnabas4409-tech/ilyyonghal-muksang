@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { MeditationMode } from '@/types';
+import posthog from 'posthog-js';
 
 interface Props {
   userId: string;
@@ -56,6 +57,11 @@ export default function OnboardingClient({ userId, defaultMode, defaultDisplayNa
     if (handle.trim()) updates.handle = handle.trim().replace(/^@/, '');
 
     await supabase.from('profiles').update(updates).eq('id', userId);
+    posthog.capture('onboarding_completed', {
+      meditation_mode: mode,
+      notification_enabled: notifEnabled,
+      has_display_name: !!displayName.trim(),
+    });
     router.push('/today');
   }
 

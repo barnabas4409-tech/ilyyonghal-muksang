@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import posthog from 'posthog-js';
 
 interface Group {
   id: string;
@@ -66,6 +67,7 @@ export default function GroupClient({ userId, groups }: Props) {
       user_id: userId,
       role: 'leader',
     });
+    posthog.capture('group_created');
 
     setLoading(false);
     router.push(`/group/${created.id}`);
@@ -91,6 +93,7 @@ export default function GroupClient({ userId, groups }: Props) {
       group_id: group.id,
       user_id: userId,
     }, { onConflict: 'group_id,user_id' });
+    posthog.capture('group_joined');
 
     setLoading(false);
     router.push(`/group/${group.id}`);

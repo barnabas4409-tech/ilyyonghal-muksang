@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import posthog from 'posthog-js';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -17,11 +18,13 @@ export default function LoginPage() {
       email,
       options: { emailRedirectTo: `${location.origin}/auth/callback` },
     });
+    posthog.capture('login_started', { method: 'magic_link' });
     setLoading(false);
     setSent(true);
   }
 
   async function handleGoogleLogin() {
+    posthog.capture('login_google_clicked');
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: 'google',

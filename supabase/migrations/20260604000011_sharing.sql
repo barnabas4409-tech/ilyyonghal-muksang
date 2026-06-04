@@ -6,11 +6,6 @@ ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS handle      text,
   ADD COLUMN IF NOT EXISTS handle_changed_at timestamptz;
 
--- 기존 사용자 자동 닉네임 부여: 벗-{6자리 hex}
-UPDATE public.profiles
-  SET handle = '벗-' || LOWER(SUBSTRING(REPLACE(gen_random_uuid()::text, '-', ''), 1, 6))
-  WHERE handle IS NULL OR handle = '';
-
 -- handle 유니크 제약 (중복 없으면 추가)
 DO $$
 BEGIN
@@ -39,17 +34,20 @@ CREATE TABLE IF NOT EXISTS public.reflection_reactions (
 
 ALTER TABLE public.reflection_reactions ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "Authenticated users read reactions"
-  ON public.reflection_reactions FOR SELECT
-  TO authenticated USING (true);
-
-CREATE POLICY IF NOT EXISTS "Users insert own reactions"
-  ON public.reflection_reactions FOR INSERT
-  TO authenticated WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY IF NOT EXISTS "Users delete own reactions"
-  ON public.reflection_reactions FOR DELETE
-  TO authenticated USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='reflection_reactions' AND policyname='Authenticated users read reactions') THEN
+    CREATE POLICY "Authenticated users read reactions"
+      ON public.reflection_reactions FOR SELECT TO authenticated USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='reflection_reactions' AND policyname='Users insert own reactions') THEN
+    CREATE POLICY "Users insert own reactions"
+      ON public.reflection_reactions FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='reflection_reactions' AND policyname='Users delete own reactions') THEN
+    CREATE POLICY "Users delete own reactions"
+      ON public.reflection_reactions FOR DELETE TO authenticated USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
 -- reflections: 공개 묵상 RLS (이미 있으면 무시)
 DO $$

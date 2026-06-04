@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { Challenge, ChallengeLog } from '@/types';
 import { CATEGORY_META } from '@/lib/challenges';
+import posthog from 'posthog-js';
 import ContributionGrid from '@/components/journey/ContributionGrid';
 
 interface LinkedReflection {
@@ -144,6 +145,11 @@ export default function ChallengeDetailClient({
     setBusy(true);
     const supabase = createClient();
     await supabase.from('challenges').update({ ended_at: todayKst, is_pinned: false }).eq('id', challenge.id);
+    posthog.capture('challenge_ended', {
+      category: challenge.category,
+      total_days: totalDays,
+      streak: streakInfo.current,
+    });
     setBusy(false);
     router.push('/');
     router.refresh();
@@ -154,6 +160,10 @@ export default function ChallengeDetailClient({
     setBusy(true);
     const supabase = createClient();
     await supabase.from('challenges').delete().eq('id', challenge.id);
+    posthog.capture('challenge_deleted', {
+      category: challenge.category,
+      total_days: totalDays,
+    });
     setBusy(false);
     router.push('/');
     router.refresh();

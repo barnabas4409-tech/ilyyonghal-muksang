@@ -7,6 +7,7 @@ import type { DailyReading, Reflection, BibleVersion } from '@/types';
 import { BIBLE_VERSION_LABELS } from '@/types';
 import { createClient } from '@/lib/supabase/client';
 import { getContent } from '@/utils/bible';
+import posthog from 'posthog-js';
 
 interface Props {
   user: User | null;
@@ -49,6 +50,7 @@ export default function TodayClient({ user, reading, existingReflection, bibleVe
         .from('reflections')
         .update({ content, highlighted_sentence: highlighted || null, updated_at: new Date().toISOString() })
         .eq('id', reflectionId);
+      posthog.capture('reflection_saved', { is_first_save: false, has_highlighted_sentence: !!highlighted.trim() });
     } else {
       const { data } = await supabase
         .from('reflections')
@@ -60,6 +62,7 @@ export default function TodayClient({ user, reading, existingReflection, bibleVe
         setReflectionId(data.id);
         localStorage.removeItem(LOCAL_KEY);
         await updateStreak(user.id, supabase);
+        posthog.capture('reflection_saved', { is_first_save: true, has_highlighted_sentence: !!highlighted.trim() });
       }
     }
 
@@ -73,11 +76,13 @@ export default function TodayClient({ user, reading, existingReflection, bibleVe
     setSharing(true);
     try {
       const text = `📖 ${reading?.passage}\n\n✍️ ${content}`;
-      if (navigator.share) {
+      const useNativeShare = !!navigator.share;
+      if (useNativeShare) {
         await navigator.share({ text });
       } else {
         await navigator.clipboard.writeText(text);
       }
+      posthog.capture('reflection_shared', { share_method: useNativeShare ? 'native' : 'clipboard' });
     } catch (err) {
       if (!(err instanceof Error && err.name === 'AbortError')) console.error(err);
     } finally {

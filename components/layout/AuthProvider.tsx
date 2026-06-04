@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import posthog from 'posthog-js';
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -16,6 +17,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         const { error } = await supabase.auth.signInAnonymously();
         if (!error) router.refresh();
       } else if (session.user && !session.user.is_anonymous) {
+        posthog.identify(session.user.id, {
+          created_at: session.user.created_at,
+        });
+
         const { data: profile } = await supabase
           .from('profiles')
           .select('font_size')

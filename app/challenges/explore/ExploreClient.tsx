@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { ChallengeCategory } from '@/types';
 import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/challenges';
+import posthog from 'posthog-js';
 
 interface Template {
   root_id: string;
@@ -88,6 +89,10 @@ export default function ExploreClient({ userId, templates, recent }: Props) {
     setCopyingId(null);
 
     if (!error) {
+      posthog.capture('challenge_started_from_explore', {
+        category: template.category,
+        participant_count: template.participant_count,
+      });
       startTransition(() => {
         router.push('/');
         router.refresh();
