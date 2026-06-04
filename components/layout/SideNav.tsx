@@ -47,6 +47,17 @@ const navItems = [
     ),
   },
   {
+    href: '/discover',
+    label: '좋은 묵상 발견',
+    icon: (active: boolean) => (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.6"
+          fill={active ? 'currentColor' : 'none'} fillOpacity={active ? '0.1' : '0'} />
+        <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
     href: '/profile',
     label: '나',
     icon: (active: boolean) => (
