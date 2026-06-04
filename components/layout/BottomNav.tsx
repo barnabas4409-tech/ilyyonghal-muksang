@@ -98,7 +98,7 @@ export default function BottomNav() {
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border pb-safe">
-      <div className="max-w-[430px] mx-auto flex items-center justify-around px-4 py-2">
+      <div className="max-w-[430px] mx-auto flex items-center justify-around px-1 py-2">
         {navItems.map(({ href, label, icon }) => {
           const active =
             pathname === href ||
@@ -108,7 +108,7 @@ export default function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-1 py-1 px-4 liquid-transition-fast ${
+              className={`flex flex-col items-center gap-1 py-1 px-2 liquid-transition-fast ${
                 active ? 'text-primary' : 'text-muted-foreground'
               }`}
             >
